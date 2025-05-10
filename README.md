@@ -75,26 +75,33 @@ This project documents the architecture, design, and phased execution of a home-
 
 ```
 cyber-range-docs/
-├── diagrams/
+├── README.md                            # Overview of the entire lab environment
+├── deployment-changelog.md             # Time-stamped build log (you’re updating this now)
+├── esxi-hardening.md                   # Optional: notes on securing the hypervisor
+│
+├── diagrams/                           # Network topology and design files
 │   ├── lab-topology.drawio
 │   └── vlan-layout.drawio
-├── configs/
+│
+├── configs/                            # Configuration backups or notes for appliances
 │   ├── pfSense/
+│   │   └── interfaces-config.xml       # (once exported)
 │   ├── Suricata/
 │   ├── Wazuh/
-│   ├── TheHive/
-│   └── Cortex/
-├── docs/
-│   ├── 01_esxi-install.md
-│   ├── 02_vsphere-networking.md
-│   ├── 03_pfsense-setup.md
-│   ├── 04_vlan-config.md
-│   └── soar-planning.md
-├── playbooks/
-│   └── test-cases.md
-├── logs/
-│   └── deployment-changelog.md
-└── README.md
+│   ├── SecurityOnion/
+│   └── ESXi/
+│       └── host-config-backup.txt
+│
+├── playbooks/                          # Test cases, attack simulations, blue team responses
+│   ├── test-cases.md
+│   └── pfSense-firewall-baseline.md
+│
+├── logs/                               # Logging behaviors, network captures, findings
+│   └── notes-on-detections.md
+│
+└── ISOs/                               # (Optional) Folder name reference only — actual ISOs not stored in Git
+    └── README.md                       # Track which ISO versions were uploaded and where
+
 ```
 
 ---
