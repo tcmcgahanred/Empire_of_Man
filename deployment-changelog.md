@@ -1,56 +1,69 @@
 ## [2025-05-08] Phase 1 Complete – ESXi Deployment + Lab Network Segmentation
 
-- Mounted Dell PowerEdge R640 into Vevor open-frame rack
-- Configured iDRAC via USB and set static IP
-- Updated BIOS, iDRAC, RAID controller (H730P), and Lifecycle Controller firmware
-- Created RAID 10 virtual disk across 4 drives
-- Installed VMware ESXi 8.0.2 using Dell-customized ISO
-- Assigned static IP to vmnic0 for management via Eero LAN
-- Created second admin account: `custodian`
-- Logged into ESXi web GUI successfully via `https://<host-ip>`
-- Created isolated vSwitch `vSwitch-palace` for lab segmentation
-- Added VLAN-tagged port groups:
-  - PG-VLAN10 (Clients)
-  - PG-VLAN20 (Servers)
-  - PG-VLAN30 (DMZ)
-  - PG-VLAN40 (Red Team / C2)
-  - PG-custodes (Admin / Custodes)
-- Enabled Promiscuous Mode and MAC Forging on appropriate port groups
-- Management and lab networking fully separated
+- Mounted Dell PowerEdge R640 into Vevor open-frame rack  
+- iDRAC9 configured via USB with static IP 192.168.4.120/24, gateway 192.168.4.1  
+- Service Tag: GKSH1S2  
+- Updated firmware via iDRAC:
+  - SAS-RAID: SAS-RAID_Firmware_700GG_WN64_25.5.9.0001_A17_01  
+  - iDRAC: iDRAC-with-Lifecycle-Controller-Firmware_RVDDR_WN64_7.00.00.181_A00  
+  - BIOS: BIOS_J6D53_WN64_2.23.0  
+- Created RAID 10 virtual disk across 4 drives using PERC H730P
+- Installed VMware ESXi 8.0 Update 2 (Dell-custom ISO)  
+- ESXi host static IP: 192.168.4.40  
+- Hostname: Lionsgate ([https://Lionsgate/](https://Lionsgate/))  
+- DNS: Primary 8.8.8.8, Alternate 1.1.1.1  
+- Created secondary ESXi admin account: `custodian`  
+- Management network isolated using vSwitch0 → `vmnic0` → Eero
 
-Next up: Deploy pfSense and build core internal lab routing.
+### vSwitch-palace (Segmented Lab Virtual Switch)
+- Created `vSwitch-palace` with no uplinks
+- Created VLAN-tagged port groups:
+  - PG-VLAN10 (vlan10) – Lab Clients
+  - PG-VLAN20 (vlan20) – Lab Servers
+  - PG-VLAN30 (vlan30) – DMZ
+  - PG-VLAN40 (vlan40) – Red Team
+  - PG-Custodes (vlan100) – Admin / CustodianNet
+- Enabled promiscuous mode, MAC address changes, and forged transmits on VLANs 10–40
+- PG-Custodes remained locked down (no promiscuous mode enabled)
 
+### pfSense Prep
+- Downloaded pfSense CE AMD64 ISO from Netgate ([https://www.pfsense.org/download/](https://www.pfsense.org/download/))
+- Used 7-Zip to extract .gz-compressed installer ISO
+- Deployed new VM `Rogal_Dorn` for pfSense
+- Initially added 5 NICs for PG-VLAN10, 20, 30, 40, and PG-Custodes
+- Attempted interface assignment with vmx0 (00:0c:29:40:2b:f8) but ran into installer limitations
 
-Dell PowerEdge R640 
-iDRAC9
-Service Tag: GKSH1S2
-Static IP: 192.168.4.120
-Static Gateway: 192.168.4.1
-RAID controller (PERC H730P)
+---
 
-Updated the following R640 firmware via iDRAC:
- SAS-RAID_Firmware_700GG_WN64_25.5.9.0001_A17_01
- iDRAC-with-Lifecycle-Controller-Firmware_RVDDR_WN64_7.00.00.181_A00
- BIOS_J6D53_WN64_2.23.0
+## [2025-05-09] Rollback to Simplified Lab Core
 
+- Removed unused NICs from `Rogal_Dorn` VM to simplify setup
+- Retained 3 NICs:
+  - NIC 1 → PG-Custodes (vlan100) → MAC: 00:0c:29:40:2b:f8
+  - NIC 2 → PG-VLAN10 (vlan10) → MAC: 00:0c:29:40:2b:02
+  - NIC 3 → VM Network (default on vSwitch0) → MAC: 00:0c:29:40:2b:0c
+- Rebuilt pfSense using two-NIC layout for core functionality:
+  - WAN → VM Network (via vSwitch0)
+  - LAN → PG-VLAN10 (Lab Clients)
+- Used VM Network MAC 00:0c:29:40:2b:0c for WAN
+- Used PG-VLAN10 MAC 00:0c:29:40:2b:02 for LAN
+- Completed pfSense CE installation successfully and reached initial configuration wizard
+- Skipped cloud-based Netgate services and proceeded with local-only configuration
+- Verified LAN connectivity to 192.168.1.1 from VLAN10
 
-ESXi 8.0 Update 2 (Dell Custom ISO)?
-ESXi 192.168.4.40 [https://192.168.4.40]
-Primary DNS set to 8.8.8.8 and Alt 1.1.1.1
-Hostname: Lionsgate [https://Lionsgate/]
- 
+### Active Network Configuration
 
-Lionsgate is using vmnic0
+**vSwitch0 (Management & WAN)**
+- Connected to `vmnic0` (Eero LAN)
+- Port groups:
+  - VM Network (active WAN interface for pfSense)
+  - PG-WAN (VLAN 60, created for future use)
 
-Segmenting to keep vSwitch0 for management.
-Going to create a new virtual switch for all other traffic.
-vSwitch-palace
-Creating port groups under vSwitch-palace:
+**vSwitch-palace (Segmented Lab)**
+- PG-VLAN10 (vmx3 → 00:0c:29:40:2b:02)
+- PG-Custodes (vmx1 → 00:0c:29:40:2b:f8)
 
-Pg-vlan10 (vlan10) (Lab Clients)	 
-Pg-vlan20 (vlan20) (Lab Servers)
-Pg-vlan30 (vlan 30) (DMZ)
-Pg-vlan40 (vlan 40) (Red Team)
-Pg-custodes (vlan100) Admin / CustodianNet)
-Enabled promiscuous, MAC address changes, and forged transmits on 10-40 (not 100 (custodes)
-
+### Next Steps
+- Change pfSense LAN IP from 192.168.1.1 to 10.0.10.1
+- Deploy test VM on PG-VLAN10 for GUI access to pfSense
+- Reintroduce VLAN20–40 and PG-Custodes as OPT interfaces in pfSense once routing is verified
