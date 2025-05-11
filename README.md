@@ -42,7 +42,6 @@ This project documents the architecture, design, and phased execution of a home-
 ### Key VMs
 - pfSense
 - Windows 10 / 11 endpoints
-- Active Directory & DNS
 - Kali Linux (Red Team)
 - Security Onion (IDS/NIDS)
 - Wazuh (SIEM)
@@ -106,28 +105,6 @@ cyber-range-docs/
 
 ---
 
-## 🗓️ Execution Phases
 
-| Phase | Description                                |
-|--------|--------------------------------------------|
-| 0      | Rack and power on server                   |
-| 1      | Install VMware ESXi                        |
-| 2      | Deploy pfSense with basic WAN/LAN setup    |
-| 3      | Build vSwitches and VLAN port groups       |
-| 4      | Deploy client/server/DMZ VMs               |
-| 5      | Deploy IDS and SIEM stack                  |
-| 6      | Build Range Admin VM                       |
-| 7      | Harden and test AWS jump server            |
-| 8      | Connect cloud jump box to lab              |
-| 9      | Monitor home network via SPAN              |
-| 10     | Begin threat emulation + detection testing |
-| 11     | Deploy TheHive and Cortex for SOAR         |
 
----
 
-## 🧠 Next Steps
-- Finalize draw.io topology
-- Deploy core infrastructure (pfSense + VLANs)
-- Build Git-based documentation pipeline
-- Integrate TheHive + Cortex with lab alerting stack
-- Begin tracking configurations and attack test cases
