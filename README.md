@@ -75,9 +75,6 @@ To establish a lean, professional-grade SOC platform that can:
 ## 📁 Git Repo Structure
 
 
-
-## 📁 Git Repo Layout
-
 ```
 cyber-range-docs/
 ├── README.md                            # Overview of the entire lab environment
