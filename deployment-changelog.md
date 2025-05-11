@@ -63,7 +63,13 @@
 - PG-VLAN10 (vmx3 → 00:0c:29:40:2b:02)
 - PG-Custodes (vmx1 → 00:0c:29:40:2b:f8)
 
-### Next Steps
-- Change pfSense LAN IP from 192.168.1.1 to 10.0.10.1
-- Deploy test VM on PG-VLAN10 for GUI access to pfSense
-- Reintroduce VLAN20–40 and PG-Custodes as OPT interfaces in pfSense once routing is verified
+
+
+Set 10.0.10.1
+
+WAN vmx2 v4/DHCP4: 192.168.4.187/22
+LAN vmx1 10.0.10.1/24
+OPT 1 vmx0
+
+admin/pfsense
+
