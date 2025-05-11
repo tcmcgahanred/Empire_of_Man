@@ -1,0 +1,7 @@
+Component,VM Name,Role,IP Address,Username,Network Port Group,Notes
+Rogal_Dorn,Rogal_Dorn,pfSense firewall/router,"WAN: 192.168.4.187, LAN: 10.0.10.1, Admin: 10.0.100.1",admin,"PG-WAN, PG-VLAN10, PG-Custodes",Multi-homed router VM controlling segmentation and traffic
+SecurityOnion,SecurityOnion,"IDS/NIDS (Suricata, Zeek)",10.0.10.11,soadmin,PG-VLAN10,Network traffic analysis and alerting
+Wazuh,Wazuh,SIEM + HIDS,10.0.10.12,admin,PG-VLAN10,"Log collection, rule-based alerting"
+TheHive,TheHive,Case management and SOC console,10.0.10.13,admin,PG-VLAN10,SOC analyst triage and incident workflow
+Cortex,Cortex,SOAR automation engine,10.0.10.14,admin,PG-VLAN10,Alert enrichment and automated response via analyzers
+Emperor_of_Mankind,Throne_Operator,Admin Workstation / C2,10.0.100.50,custodian,PG-Custodes,Secure analyst/admin jump host
