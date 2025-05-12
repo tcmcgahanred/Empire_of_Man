@@ -1,15 +1,15 @@
 ## 🧾 Infrastructure + Core VM Summary
 
-| Component                   | IP Address              | Username         | Role / Function                                | Network Port Group(s)             | Notes                                                   |
+| Component                   | IP Address              | Username         | Role / Function                                | Network Port Group(s)             | Notes                                                    |
 |----------------------------|--------------------------|------------------|------------------------------------------------|-----------------------------------|----------------------------------------------------------|
 | iDRAC (Dell R640)          | 192.168.4.120            | root             | Out-of-band server management                  | Physical                          | Accessible via micro-USB or LAN                          |
 | ESXi Host (Lionsgate)      | 192.168.4.40             | root / custodian | Hypervisor Web UI                              | VM Network (mgmt only)            | Manages all VMs; not part of segmented lab               |
 | pfSense WAN (Rogal_Dorn)   | 192.168.4.187 (WAN)      | admin            | Firewall/router WAN uplink                     | PG-WAN                            | DHCP from Eero                                           |
 | pfSense LAN (Rogal_Dorn)   | 10.0.10.1 (LAN)          | admin            | Inter-VLAN routing + firewalling               | PG-VLAN10                         | Gateway for lab services                                 |
-| pfSense OPT1 (Custodes)    | 10.0.100.1 (Admin VLAN)  | admin            | Admin-only VLAN interface                      | PG-Custodes                       | Restricted to `Emperor_of_Mankind`                      |
+| pfSense OPT1 (Custodes)    | 10.0.100.1 (Admin VLAN)  | admin            | Admin-only VLAN interface                      | PG-Custodes                       | Restricted to `Emperor_of_Mankind`                       |
 | Rogal_Dorn (VM)            | -                        | admin            | Core pfSense appliance                         | PG-WAN, PG-VLAN10, PG-Custodes    | Interfaces to all VLANs                                  |
-| SecurityOnion             | 10.0.10.11               | soadmin          | IDS/NIDS (Suricata, Zeek)                      | PG-VLAN10                         | Full packet capture and detection                        |
-| Wazuh                     | 10.0.10.12               | admin            | SIEM + HIDS                                    | PG-VLAN10                         | Log ingestion and alerting                               |
-| TheHive                   | 10.0.10.13               | admin            | IR Case Management                             | PG-VLAN10                         | Manages alerts and case workflow                         |
-| Cortex                    | 10.0.10.14               | admin            | SOAR Automation Engine                         | PG-VLAN10                         | Enrichment, passive/active response automation           |
-| Emperor_of_Mankind        | 10.0.100.50              | custodian        | Admin Workstation (C2)                         | PG-Custodes                       | Full control access to all security appliances           |
+| SecurityOnion              | 10.0.10.11               | soadmin          | IDS/NIDS (Suricata, Zeek)                      | PG-VLAN10                         | Full packet capture and detection                        |
+| Wazuh                      | 10.0.10.12               | admin            | SIEM + HIDS                                    | PG-VLAN10                         | Log ingestion and alerting                               |
+| TheHive                    | 10.0.10.13               | admin            | IR Case Management                             | PG-VLAN10                         | Manages alerts and case workflow                         |
+| Cortex                     | 10.0.10.14               | admin            | SOAR Automation Engine                         | PG-VLAN10                         | Enrichment, passive/active response automation           |
+| Emperor_of_Mankind         | 10.0.100.50              | custodian        | Admin Workstation (C2)                         | PG-Custodes                       | Full control access to all security appliances           | 
