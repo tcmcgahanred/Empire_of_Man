@@ -89,3 +89,81 @@ admin/pfsense
 | 9      | Monitor home network via SPAN              |
 | 10     | Begin threat emulation + detection testing |
 | 11     | Deploy TheHive and Cortex for SOAR         |
+
+Absolutely, Archmagos. Below is a structured and professionally formatted `changelog.md` entry documenting today’s sacred work on the *Emperor\_of\_Mankind* node and the broader STC-SOCaaS\_v1 prototype.
+
+---
+
+## 🪐 `changelog.md` — 2025-05-12
+
+### **Subject:** Provisioning of *Emperor\_of\_Mankind* (SOCaaS Admin Node)
+
+---
+
+### 🧱 **Infrastructure Events**
+
+* Verified `pg-custodes` port group mapping in ESXi.
+* Identified initial networking failure due to *Rogal\_Dorn* not being powered on.
+* Corrected VM network segmentation:
+
+  * Reassigned one of *Rogal\_Dorn*'s NICs from `pg-vlan10` to `pg-custodes`.
+  * Reassigned pfSense’s LAN interface to this NIC and confirmed it was set to `10.0.10.1/24`.
+* Brought *Emperor\_of\_Mankind* online with a static IP (`10.0.10.10`) via Netplan using modern route syntax.
+
+---
+
+### 🔧 **Ubuntu Workstation Stabilization**
+
+* Resolved black screen issue post-install by using `nomodeset` kernel parameter in GRUB.
+* Made `nomodeset` permanent to ensure graphical session stability.
+* Installed `open-vm-tools` and `open-vm-tools-desktop` to restore clipboard and display integration.
+
+---
+
+### 🔐 **Provisioning Script: `provision.sh`**
+
+* Authored and executed a full provisioning script to baseline the system.
+* Major actions:
+
+  * Updated system packages.
+  * Installed essential tooling (e.g., curl, git, zsh, ufw, fail2ban).
+  * Set hostname to `Emperor_of_Mankind` and updated `/etc/hosts`.
+  * Created hardened admin user `malcador-the-sigillite`.
+  * Disabled root SSH login and password-based auth.
+  * Configured UFW to allow only SSH inbound.
+  * Enabled `fail2ban` for brute-force protection.
+* Script enhanced with `tee` logging to `~/Desktop/hardening_log.txt`.
+
+---
+
+### 🔑 **SSH Key Setup Script: `setup_ssh_key.sh`**
+
+* Authored a companion script to install an SSH public key for `malcador-the-sigillite`.
+* Script includes:
+
+  * `.ssh` directory creation
+  * `authorized_keys` setup
+  * Proper permissions and ownership enforcement
+  * Clear comments for deferred use
+
+---
+
+### 🧠 **Knowledge Notes**
+
+* Confirmed:
+
+  * Ubuntu usernames must follow `NAME_REGEX` rules: lowercase letters, numbers, and dashes only.
+  * `gateway4` is deprecated in Netplan; replaced with `routes: - to: default via: x.x.x.x`.
+  * `nomodeset` disables GPU driver loading, avoiding crashes, but also disables dynamic resolution.
+
+---
+
+### 🗂️ **Artifacts Created**
+
+* `provision.sh` – full provisioning and hardening script
+* `setup_ssh_key.sh` – SSH key installation script for admin account
+* `hardening_log.txt` – log of provisioning actions (created at runtime)
+
+---
+
+Let me know if you'd like this saved as a file now (`changelog.md`) or appended into a central documentation repository as your prototype expands.
