@@ -61,6 +61,23 @@ This effort documents the architecture and operations of a blue team–focused S
 
 
 ---
+📁 Project Structure (Empire_of_Man/)
+
+- `configs/` — System configuration files for VMs, appliances, and networking
+  - `Appliances/pfsense/` — pfSense configuration and interface assignments
+  - `VMs/` — Ubuntu provisioning scripts, netplan configs, and host settings
+  - `Networking/` — Topology definitions, port group mappings, VLAN plans
+- `dependencies/` — External references, templates, or dependency tracking (consider renaming for clarity)
+- `diagrams/` — Topology maps and architectural diagrams (e.g., `.drawio`, `.png`)
+- `logs/` — System provisioning output, build logs, and recorded test activity
+- `playbooks/` — Incident response procedures and detection engineering documentation
+- `scripts/` — Shell scripts for provisioning, hardening, and admin automation
+  - `provision.sh` — Initial host setup and baseline hardening
+  - `setup_ssh_key.sh` — SSH key deployment for new analyst/admin accounts
+  - `hardening_script.sh` — Secure config enforcement for Ubuntu-based systems
+- `Security/` — Security hardening notes, baseline checklists, or audit configurations (consider clarifying scope)
+
+---
 
 
 ## 🚀 Roadmap
