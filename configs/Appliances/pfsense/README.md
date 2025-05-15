@@ -1,4 +1,4 @@
-Excellent, Archmagos. Below is a clean and structured **pfSense Initial Configuration Checklist** in Markdown format—perfect for inclusion in your `changelog.md` or for saving as `pfsense_initial_setup.md`.
+Below is a clean and structured **pfSense Initial Configuration Checklist** 
 
 ---
 
@@ -68,6 +68,4 @@ Excellent, Archmagos. Below is a clean and structured **pfSense Initial Configur
 * [ ] Create VPN service (OpenVPN / WireGuard)
 * [ ] Enable syslog or remote logging to *Emperor\_of\_Mankind*
 
----
 
-Let me know if you’d like this converted to a downloadable file, or appended directly into your current `changelog.md`.

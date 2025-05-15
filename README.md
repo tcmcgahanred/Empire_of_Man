@@ -46,36 +46,22 @@ This effort documents the architecture and operations of a blue team–focused S
 
 ---
 
-## 🧾 Component Inventory
+## 📦 STC-SOCaaS_v1 Prototype – Current Scope
 
-| Component                   | IP Address              | Username         | Role / Function                                | Network Port Group(s)             | Notes                                                   |
-|----------------------------|--------------------------|------------------|------------------------------------------------|-----------------------------------|----------------------------------------------------------|
-| iDRAC (Dell R640)          | 192.168.4.120            | root             | Out-of-band server management                  | Physical                          | Accessed via micro-USB or LAN                            |
-| ESXi Host (Lionsgate)      | 192.168.4.40             | root / custodian | Hypervisor Web UI                              | VM Network                        | Manages all VMs; not part of segmented prototype         |
-| pfSense WAN (Rogal_Dorn)   | 192.168.4.187 (WAN)      | admin            | Firewall/router WAN uplink                     | PG-WAN                            | DHCP from Eero                                           |
-| pfSense LAN (Rogal_Dorn)   | 10.0.10.1 (LAN)          | admin            | Inter-VLAN routing + firewalling               | PG-VLAN10                         | Gateway for SOC services                                 |
-| pfSense OPT1 (Custodes)    | 10.0.100.1 (Admin VLAN)  | admin            | Admin-only VLAN interface                      | PG-Custodes                       | Restricted to `Emperor_of_Mankind`                       |
-| Rogal_Dorn (VM)            | -                        | admin            | Core pfSense appliance                         | PG-WAN, PG-VLAN10, PG-Custodes    | Interfaces to all VLANs                                  |
-| SecurityOnion              | 10.0.10.11               | soadmin          | IDS/NIDS (Suricata, Zeek)                      | PG-VLAN10                         | Packet inspection, flow analysis                         |
-| Wazuh                      | 10.0.10.12               | admin            | SIEM + HIDS                                    | PG-VLAN10                         | Log aggregation, rules, and alerting                     |
-| TheHive                    | 10.0.10.13               | admin            | IR Case Management                             | PG-VLAN10                         | Alert triage and SOC workflow                            |
-| Cortex                     | 10.0.10.14               | admin            | SOAR Automation Engine                         | PG-VLAN10                         | Enrichment and automated response                        |
-| Emperor_of_Mankind         | 10.0.100.50              | custodian        | Admin Workstation (C2 Node)                    | PG-Custodes                       | Controls and manages internal appliances                 |
+- Dell R640 server running ESXi 8.0.2  
+- vSwitch-palace virtual switching layer  
+- pfSense firewall VM ("Rogal_Dorn") providing routing, DHCP, and segmentation  
+- Admin workstation VM ("Emperor_of_Mankind") with CLI tools and hardening  
+- Port group segmentation via pg-custodes  
+- Static IP assignments in the 10.0.10.0/24 range  
+- Basic blue team tooling: fail2ban, ufw, git, zsh, open-vm-tools  
+- Full provisioning and hardening scripted in provision.sh  
+- SSH access managed via key-based login (setup_ssh_key.sh)
+
+
 
 ---
 
-## 🔐 Segmentation Strategy
-
-| VLAN ID | Port Group     | Purpose                        |
-|---------|----------------|--------------------------------|
-| 10      | PG-VLAN10      | SOC core services              |
-| 60      | PG-WAN         | WAN uplink to Eero             |
-| 100     | PG-Custodes    | Admin-only command VLAN        |
-
-Traffic segmentation and isolation enforced by `Rogal_Dorn` (pfSense). VLANs are not bridged unless explicitly routed.
-
-
----
 
 ## 🚀 Roadmap
 
