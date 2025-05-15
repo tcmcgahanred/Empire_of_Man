@@ -12,11 +12,13 @@
 
 ## 📜 Mission
 
-This project aims to design, build, and maintain a modular, secure, and scalable Security Operations Center as a Service (SOCaaS) platform tailored for small businesses, nonprofits, schools, and underserved communities.
+This project establishes a modular, secure, and scalable Security Operations Center as a Service (SOCaaS) platform designed for small businesses, nonprofits, schools, and underserved communities.
 
-The prototype is engineered to ingest telemetry from forward-deployed sensors—lightweight agents or hardware collectors installed at client environments—which securely transmit logs, alerts, and network visibility data to a centralized SOC for real-time monitoring and response.
+The prototype ingests telemetry from forward-deployed sensors—lightweight agents or hardware collectors installed at client sites—that securely transmit logs, alerts, and network data to a centralized SOC for real-time monitoring and response.
 
-This effort documents the architecture, implementation, and operational model of a blue team–focused SOC, serving as the foundation for a future SOCaaS company. The platform is intended to deliver 24/7 cybersecurity monitoring, consultation, and incident response capabilities to under-resourced organizations, including 501(c)(3) nonprofits and public sector institutions.
+Built initially on physical infrastructure to mirror more likely deployment scenarios, the platform may eventually transition to a cloud-based model as operational needs evolve.
+
+This effort documents the architecture and operations of a blue team–focused SOC, serving as the foundation for a future Managed Security Service Provider (MSSP) offering a robust suite of blue and purple team capabilities. The long-term goal is to deliver 24/7 cybersecurity monitoring, consultation, and incident response to under-resourced organizations, including 501(c)(3)s and public institutions.
 ---
 
 ## 🛠️ Core Capabilities
