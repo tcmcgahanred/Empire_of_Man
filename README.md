@@ -1,6 +1,7 @@
 ![alt text](TYML4855.JPG)> 
 
 **Security Notice:**  
+
 > This documentation references internal-only, non-routable IP addresses and placeholder configurations. No live infrastructure or internet-facing systems are exposed through this repository.
 
 # 🔱 STC-SOCaaS_v1
@@ -22,12 +23,24 @@ This effort documents the architecture and operations of a blue team–focused S
 
 ---
 
-🛡️ Inspiration & Thematic Alignment
+## 🛡️ Inspiration & Thematic Alignment
+
 This project draws inspiration from the lore and aesthetic of Warhammer 40,000, aligning each system, VM, and security component with the roles and responsibilities of the Imperium of Man. The naming conventions—Rogal_Dorn, Emperor_of_Mankind, pg-custodes—reflect a deliberate mapping between cybersecurity infrastructure and the eternal vigilance of the Imperium’s defenders.
 
 "In the grim darkness of the far future, there is only war."
 
 The STC-SOCaaS prototype embodies that ethos, designed as a fortress of digital resilience for underserved communities besieged by constant threats.
+
+---
+
+
+## 🧠 Philosophy
+
+> This platform is not a "lab" — it is a **prototype** for a replicable, affordable cybersecurity service.  
+> Its mission is to extend cyber defense capabilities to those most in need, with structure, strategy, and stewardship.
+
+*“In vigilance, we serve. In segmentation, we shield. In automation, we strike.”*  
+*— STC-SOCaaS_v1 Primer, Machine-Verified*
 
 ---
 
@@ -71,7 +84,8 @@ The STC-SOCaaS prototype embodies that ethos, designed as a fortress of digital 
 
 
 ---
-📁 Project Structure (Empire_of_Man/)
+
+## 📁 Project Structure (Empire_of_Man/)
 
 - `configs/` — System configuration files for VMs, appliances, and networking
   - `Appliances/pfsense/` — pfSense configuration and interface assignments
@@ -102,12 +116,5 @@ The STC-SOCaaS prototype embodies that ethos, designed as a fortress of digital 
 
 ---
 
-## 🧠 Philosophy
 
-> This platform is not a "lab" — it is a **prototype** for a replicable, affordable cybersecurity service.  
-> Its mission is to extend cyber defense capabilities to those most in need, with structure, strategy, and stewardship.
 
----
-
-*“In vigilance, we serve. In segmentation, we shield. In automation, we strike.”*  
-*— STC-SOCaaS_v1 Primer, Machine-Verified*
