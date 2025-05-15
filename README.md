@@ -22,6 +22,15 @@ This effort documents the architecture and operations of a blue team–focused S
 
 ---
 
+🛡️ Inspiration & Thematic Alignment
+This project draws inspiration from the lore and aesthetic of Warhammer 40,000, aligning each system, VM, and security component with the roles and responsibilities of the Imperium of Man. The naming conventions—Rogal_Dorn, Emperor_of_Mankind, pg-custodes—reflect a deliberate mapping between cybersecurity infrastructure and the eternal vigilance of the Imperium’s defenders.
+
+"In the grim darkness of the far future, there is only war."
+
+The STC-SOCaaS prototype embodies that ethos, designed as a fortress of digital resilience for underserved communities besieged by constant threats.
+
+---
+
 ## 🛠️ Core Capabilities
 
 - Full SOC stack: SIEM, IDS/NIDS, SOAR, case management
