@@ -1,6 +1,3 @@
 made with https://app.diagrams.net/
 
-![
-    
-    
-](Empire_of_Man_Topology.png.png)
+![alt text](Empire_of_Man_Topology.png-1.png)
