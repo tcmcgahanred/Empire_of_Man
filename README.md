@@ -1,141 +1,98 @@
-# 🛡️ SOC-as-a-Service Platform (Prototype)
+![alt text](TYML4855.JPG)> 
 
-This project documents the design, architecture, and deployment of a blue team–focused SOC platform, developed as the foundation for a future **SOC-as-a-Service (SOCaaS)** company. The goal is to build a scalable, modular, and secure virtual environment capable of providing **24/7 cybersecurity monitoring, consultation, and incident response** services to small organizations, such as 501(c)(3) nonprofits and other under-resourced entities.
+**Security Notice:**  
+> This documentation references internal-only, non-routable IP addresses and placeholder configurations. No live infrastructure or internet-facing systems are exposed through this repository.
 
----
+# 🔱 STC-SOCaaS_v1
 
-## 🎯 Vision
-
-To establish a lean, professional-grade SOC platform that can:
-- Support a small cybersecurity business (< 50 employees)
-- Serve multiple clients across a region via remote telemetry ingestion
-- Deliver SIEM, IDS, SOAR, and IR workflows affordably and reliably
-- Provide 24/7 detection, monitoring, and analyst response
+> **Standard Template Construct (STC): SOC-as-a-Service Platform Prototype (SOCaas)**  
+> *Designed for small organizations in need of real cybersecurity. Deployed by Archmagos Prime McGahan.*
 
 ---
 
-## 🧱 Core Architecture
+## 📜 Mission
 
-### Host System
-- **Dell PowerEdge R640**
-  - Dual Xeon CPUs
-  - 64–128GB RAM
-  - Quad-port i350 NIC
-  - VMware ESXi 8.0
-  - Mounted in Vevor open-frame rack
+This project aims to design, build, and maintain a modular, secure, and scalable Security Operations Center as a Service (SOCaaS) platform tailored for small businesses, nonprofits, schools, and underserved communities.
 
-### Network Topology
-- `vSwitch0`: Management / Eero LAN
-- `vSwitch-palace`: Segmented internal SOC traffic (no uplinks)
-- `pfSense` (Rogal_Dorn) as central firewall and router
+The prototype is engineered to ingest telemetry from forward-deployed sensors—lightweight agents or hardware collectors installed at client environments—which securely transmit logs, alerts, and network visibility data to a centralized SOC for real-time monitoring and response.
 
-### VLAN Port Groups
-| VLAN ID | Port Group     | Purpose                      |
-|---------|----------------|------------------------------|
-| 10      | PG-VLAN10      | Core SOC services            |
-| 100     | PG-Custodes    | Admin-only access (C2 node)  |
+This effort documents the architecture, implementation, and operational model of a blue team–focused SOC, serving as the foundation for a future SOCaaS company. The platform is intended to deliver 24/7 cybersecurity monitoring, consultation, and incident response capabilities to under-resourced organizations, including 501(c)(3) nonprofits and public sector institutions.
+---
+
+## 🛠️ Core Capabilities
+
+- Full SOC stack: SIEM, IDS/NIDS, SOAR, case management
+- Segmented virtual network with pfSense and VLAN isolation
+- **Disparate sensor ingestion**: Clients send data via VPN, TLS, or other encrypted channels
+- Field kit–friendly: Wazuh agents, Raspberry Pi sensors, or Zeek gateways supported
+- Hardened admin access through a dedicated operator node
+- Entirely open-source and replicable infrastructure
 
 ---
 
-## 🧰 Platform VMs
+## 🧱 Infrastructure Overview
 
-| VM Name           | Role                             | Notes                                     |
-|-------------------|----------------------------------|--------------------------------------------|
-| `Rogal_Dorn`      | pfSense (router/firewall)        | Segmentation and external connectivity    |
-| `SecurityOnion`   | IDS/NIDS                         | Suricata/Zeek, full packet analysis       |
-| `Wazuh`           | SIEM + HIDS                      | Remote log collection, alerting, asset inventory |
-| `TheHive`         | IR case management               | Analyst workflows, alert triage           |
-| `Cortex`          | SOAR automation                  | Automated enrichment, active response     |
-| `Throne_Operator` | Admin VM                         | Secure analyst/admin GUI workstation      |
+### Host Platform
 
----
-
-## 🔐 Security Model
-
-- **No red team activity generated locally**
-- Strict segmentation between internal services and external ingress
-- External telemetry expected via secure VPN, Syslog/TLS, or agent pipelines
-- All administrative activity flows through `PG-Custodes` only
-- pfSense enforces VLAN boundaries and external visibility
+| Element       | Value                         |
+|---------------|-------------------------------|
+| Chassis       | Dell PowerEdge R640           |
+| Hypervisor    | VMware ESXi 8.0.2             |
+| CPU/RAM       | Dual Xeon, 64–128GB RAM       |
+| NICs          | Quad-port i350                |
+| Rack          | Mounted in open-frame Vevor rack |
 
 ---
 
-## 🧠 Business Prototype Goals
+## 🧾 Component Inventory
 
-- Serve multiple small clients (nonprofits, small clinics, K-12, etc.)
-- Deploy lightweight telemetry kits to customer networks (agents, sensors, Pi-based collectors)
-- Deliver:
-  - 24/7 alerting and SOC visibility
-  - Customized dashboards and metrics
-  - On-call incident response and escalation workflows
-  - Threat intelligence and vulnerability context
+| Component                   | IP Address              | Username         | Role / Function                                | Network Port Group(s)             | Notes                                                   |
+|----------------------------|--------------------------|------------------|------------------------------------------------|-----------------------------------|----------------------------------------------------------|
+| iDRAC (Dell R640)          | 192.168.4.120            | root             | Out-of-band server management                  | Physical                          | Accessed via micro-USB or LAN                            |
+| ESXi Host (Lionsgate)      | 192.168.4.40             | root / custodian | Hypervisor Web UI                              | VM Network                        | Manages all VMs; not part of segmented prototype         |
+| pfSense WAN (Rogal_Dorn)   | 192.168.4.187 (WAN)      | admin            | Firewall/router WAN uplink                     | PG-WAN                            | DHCP from Eero                                           |
+| pfSense LAN (Rogal_Dorn)   | 10.0.10.1 (LAN)          | admin            | Inter-VLAN routing + firewalling               | PG-VLAN10                         | Gateway for SOC services                                 |
+| pfSense OPT1 (Custodes)    | 10.0.100.1 (Admin VLAN)  | admin            | Admin-only VLAN interface                      | PG-Custodes                       | Restricted to `Emperor_of_Mankind`                       |
+| Rogal_Dorn (VM)            | -                        | admin            | Core pfSense appliance                         | PG-WAN, PG-VLAN10, PG-Custodes    | Interfaces to all VLANs                                  |
+| SecurityOnion              | 10.0.10.11               | soadmin          | IDS/NIDS (Suricata, Zeek)                      | PG-VLAN10                         | Packet inspection, flow analysis                         |
+| Wazuh                      | 10.0.10.12               | admin            | SIEM + HIDS                                    | PG-VLAN10                         | Log aggregation, rules, and alerting                     |
+| TheHive                    | 10.0.10.13               | admin            | IR Case Management                             | PG-VLAN10                         | Alert triage and SOC workflow                            |
+| Cortex                     | 10.0.10.14               | admin            | SOAR Automation Engine                         | PG-VLAN10                         | Enrichment and automated response                        |
+| Emperor_of_Mankind         | 10.0.100.50              | custodian        | Admin Workstation (C2 Node)                    | PG-Custodes                       | Controls and manages internal appliances                 |
 
 ---
 
-## 📁 Git Repo Structure
+## 🔐 Segmentation Strategy
 
+| VLAN ID | Port Group     | Purpose                        |
+|---------|----------------|--------------------------------|
+| 10      | PG-VLAN10      | SOC core services              |
+| 60      | PG-WAN         | WAN uplink to Eero             |
+| 100     | PG-Custodes    | Admin-only command VLAN        |
 
-```
-cyber-range-docs/
-├── README.md                            # Overview of the entire lab environment
-├── deployment-changelog.md             # Time-stamped build log (you’re updating this now)
-├── esxi-hardening.md                   # Optional: notes on securing the hypervisor
-│
-├── diagrams/                           # Network topology and design files
-│   ├── lab-topology.drawio
-│   └── vlan-layout.drawio
-│
-├── configs/                            # Configuration backups or notes for appliances
-│   ├── pfSense/
-│   │   └── interfaces-config.xml       # (once exported)
-│   ├── Suricata/
-│   ├── Wazuh/
-│   ├── SecurityOnion/
-│   └── ESXi/
-│       └── host-config-backup.txt
-│
-├── playbooks/                          # Test cases, attack simulations, blue team responses
-│   ├── test-cases.md
-│   └── pfSense-firewall-baseline.md
-│
-├── logs/                               # Logging behaviors, network captures, findings
-│   └── notes-on-detections.md
-│
-└── ISOs/                               # (Optional) Folder name reference only — actual ISOs not stored in Git
-    └── README.md                       # Track which ISO versions were uploaded and where
-
-```
-
+Traffic segmentation and isolation enforced by `Rogal_Dorn` (pfSense). VLANs are not bridged unless explicitly routed.
 
 
 ---
 
-## 📅 Deployment Phases
+## 🚀 Roadmap
 
-| Phase | Description                                       |
-|--------|---------------------------------------------------|
-| 1      | Rack, power, and configure base server            |
-| 2      | Deploy ESXi and create vSwitch segmentation       |
-| 3      | Install pfSense and establish VLAN topology       |
-| 4      | Deploy Wazuh and enable external agent ingestion  |
-| 5      | Stand up Security Onion and configure flow analysis |
-| 6      | Deploy TheHive and Cortex; integrate with Wazuh   |
-| 7      | Deploy and harden Throne_Operator admin VM        |
-| 8      | Begin onboarding of external telemetry sources    |
-| 9      | Build response playbooks and customer reporting flow |
+- [x] Segment hypervisor traffic and establish VLANs
+- [x] Deploy pfSense and configure WAN/LAN/OPT interfaces
+- [x] Stand up Wazuh, Security Onion, TheHive, Cortex
+- [x] Provision hardened admin node (`Emperor_of_Mankind`)
+- [ ] Ingest real-world telemetry from external sources
+- [ ] Begin tuning alerts, playbooks, and threat detection signatures
+- [ ] Document onboarding kit for remote orgs
 
 ---
 
-## 🌍 Future Integration Targets
+## 🧠 Philosophy
 
-- Wazuh agents on external networks (via VPN or TLS)
-- Passive traffic collectors (e.g., Zeek sensors on Raspberry Pi)
-- SOAR playbooks mapped to NIST and CIS Controls
-- Threat intel ingestion via Cortex analyzers
-- Lightweight alerting dashboards for client access
+> This platform is not a "lab" — it is a **prototype** for a replicable, affordable cybersecurity service.  
+> Its mission is to extend cyber defense capabilities to those most in need, with structure, strategy, and stewardship.
 
 ---
 
-## 🚀 Strategic Outcome
-
-This lab is the operational blueprint for launching a real-world, affordable SOC-as-a-Service business — one built to protect small organizations who need it most, without enterprise overhead.
+*“In vigilance, we serve. In segmentation, we shield. In automation, we strike.”*  
+*— STC-SOCaaS_v1 Primer, Machine-Verified*
