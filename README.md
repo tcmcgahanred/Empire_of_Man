@@ -19,6 +19,7 @@ The prototype ingests telemetry from forward-deployed sensors—lightweight agen
 Built initially on physical infrastructure to mirror more likely deployment scenarios, the platform may eventually transition to a cloud-based model as operational needs evolve.
 
 This effort documents the architecture and operations of a blue team–focused SOC, serving as the foundation for a future Managed Security Service Provider (MSSP) offering a robust suite of blue and purple team capabilities. The long-term goal is to deliver 24/7 cybersecurity monitoring, consultation, and incident response to under-resourced organizations, including 501(c)(3)s and public institutions.
+
 ---
 
 ## 🛠️ Core Capabilities
