@@ -167,3 +167,97 @@ Absolutely, Archmagos. Below is a structured and professionally formatted `chang
 ---
 
 Let me know if you'd like this saved as a file now (`changelog.md`) or appended into a central documentation repository as your prototype expands.
+
+
+## 📜 `changelog.md` — Cumulative Update (Since Last Logged)
+
+### **Coverage Period:** From Last Changelog Request → 2025-05-20
+
+---
+
+### 🧱 Infrastructure Changes
+
+* Verified functional ESXi 8.0.2 installation on Dell PowerEdge R640
+* Mounted and configured pfSense VM (Rogal\_Dorn) with WAN and LAN interfaces:
+
+  * WAN: 192.168.4.187 (via VM Network)
+  * LAN: 10.0.10.1 (via pg-custodes)
+* Configured and validated pfSense DHCP, firewall, and interface rules
+* Successfully segmented LAN-side traffic via `vSwitch-palace` and `pg-custodes`
+* Confirmed VM `Emperor_of_Mankind` has full IP and DNS reachability via pfSense
+
+---
+
+### ⚙️ Git & Documentation Enhancements
+
+* Reorganized GitHub repo (`Empire_of_Man`) with the following folder structure:
+
+  * `configs/` (subfolders: Appliances, Networking, VMs)
+  * `diagrams/` (for .drawio and .png topology maps)
+  * `playbooks/`, `Security/`, `logs/`, and `dependencies/`
+* Added README structural section to describe all directories and their function
+* Wrote detailed `README.md` and `configs/README.md` for component tracking and configuration
+* Created `COMPONENTS.md` and asset tables for:
+
+  * Implemented VMs
+  * Software appliances
+  * Installed blue team tooling on analyst workstation
+
+---
+
+### 🛡️ Strategic Decisions
+
+* Chose not to route all home traffic through pfSense
+* Retained Eero mesh system as primary home network routing layer
+* Designated pfSense for lab-side segmentation and future VLAN control only
+
+---
+
+### 🧪 Detection & Visibility Direction
+
+* Selected **agent-based telemetry model** (Wazuh agents) instead of passive wire mirroring
+* Deferred Security Onion deployment to later phase
+* Chose to install Wazuh manager on internal VM and deploy Wazuh agents to:
+
+  * `Emperor_of_Mankind`
+  * Future test systems and optionally external clients
+* Telemetry strategy designed to minimize infrastructure disruption
+
+---
+
+### 🧠 Launch Automation
+
+* Built PowerShell script `Launch-SOCaaS.ps1` to automate:
+
+  * Opening Git repo folder
+  * Launching VS Code in project context
+  * Opening ChatGPT in browser
+  * Opening ESXi host interface ([https://192.168.4.40](https://192.168.4.40))
+* Integrated Windows Text-to-Speech voice cue:
+
+  > "All systems online, Archmagos. The Emperor protects."
+* Created `.vbs` wrapper (`Launch-SOCaaS.vbs`) to silently execute `.ps1` script (later reverted)
+* Final decision: run `.ps1` directly from desktop
+
+---
+
+### 🎨 Miscellaneous & Support Tools
+
+* Created draw\.io network topology diagram for current environment
+* Discussed router upgrade options; deferred Eero replacement
+* Clarified differences between port groups and VLANs in ESXi
+* Validated pfSense routing between vmx0 and vmx1 interfaces
+* Confirmed physical NIC-to-vSwitch-to-VM mappings on ESXi
+
+---
+
+### ✅ Current State
+
+* Core components active:
+
+  * Dell R640
+  * pfSense (Rogal\_Dorn)
+  * Ubuntu Analyst Node (Emperor\_of\_Mankind)
+* Git, VS Code, and workflow automation operational
+* Lab is telemetry-ready for Wazuh deployment
+* System start script tested and functional
