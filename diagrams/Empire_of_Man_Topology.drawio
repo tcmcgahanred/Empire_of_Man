@@ -1,6 +1,6 @@
-<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36 Edg/137.0.0.0" version="27.0.5">
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36 Edg/137.0.0.0" version="27.2.0">
   <diagram name="Page-1" id="QNzF2ZHjbEMLiULt4nLU">
-    <mxGraphModel dx="1373" dy="247" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+    <mxGraphModel dx="3475" dy="1063" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -33,13 +33,13 @@
         <mxCell id="45hvBmFAHdr5WttG05ll-4" value="Rogal_Dorn Firewall&lt;div&gt;192.168.4.40&lt;/div&gt;&lt;div&gt;LAN: 10.0.10.1 / pg-custodes&lt;/div&gt;&lt;div&gt;admin@10.0.10.1&lt;/div&gt;" style="image;html=1;image=img/lib/clip_art/networking/Firewall_02_128x128.png" parent="45hvBmFAHdr5WttG05ll-9" vertex="1">
           <mxGeometry x="60" y="40" width="80" height="80" as="geometry" />
         </mxCell>
-        <mxCell id="45hvBmFAHdr5WttG05ll-36" value="Emperor_of_Mankind&lt;div&gt;IPv4: 10.0.10.10&lt;/div&gt;" style="verticalLabelPosition=bottom;html=1;verticalAlign=top;align=center;strokeColor=none;fillColor=#00BEF2;shape=mxgraph.azure.virtual_machine;" parent="45hvBmFAHdr5WttG05ll-9" vertex="1">
+        <mxCell id="45hvBmFAHdr5WttG05ll-36" value="Emperor_of_Mankind&lt;div&gt;Command Node&lt;br&gt;&lt;div&gt;IPv4: 10.0.10.10&lt;/div&gt;&lt;/div&gt;" style="verticalLabelPosition=bottom;html=1;verticalAlign=top;align=center;strokeColor=none;fillColor=#00BEF2;shape=mxgraph.azure.virtual_machine;" parent="45hvBmFAHdr5WttG05ll-9" vertex="1">
           <mxGeometry x="250" y="50" width="50" height="40" as="geometry" />
         </mxCell>
         <mxCell id="45hvBmFAHdr5WttG05ll-5" value="" style="container=1;collapsible=0;expand=0;recursiveResize=0;html=1;whiteSpace=wrap;strokeColor=#1192E8;fillColor=none;strokeWidth=1" parent="1" vertex="1">
           <mxGeometry x="900" y="800" width="220" height="140" as="geometry" />
         </mxCell>
-        <mxCell id="45hvBmFAHdr5WttG05ll-6" value="Port Group: pg-vlan10 &#xa;VLAN ID: 10 &gt; vmnic1" style="shape=rect;fillColor=none;aspect=fixed;resizable=0;labelPosition=right;verticalLabelPosition=middle;align=left;verticalAlign=middle;strokeColor=none;part=1;spacingLeft=5;fontSize=14;" parent="45hvBmFAHdr5WttG05ll-5" vertex="1">
+        <mxCell id="45hvBmFAHdr5WttG05ll-6" value="Port Group: pg-administratum &#xa;VLAN ID: 10 &gt; vmnic1" style="shape=rect;fillColor=none;aspect=fixed;resizable=0;labelPosition=right;verticalLabelPosition=middle;align=left;verticalAlign=middle;strokeColor=none;part=1;spacingLeft=5;fontSize=14;" parent="45hvBmFAHdr5WttG05ll-5" vertex="1">
           <mxGeometry width="48" height="48" relative="1" as="geometry" />
         </mxCell>
         <mxCell id="45hvBmFAHdr5WttG05ll-7" value="" style="fillColor=#1192E8;shape=mxgraph.ibm_cloud.vlan;strokeColor=none;dashed=0;outlineConnect=0;html=1;labelPosition=center;verticalLabelPosition=bottom;verticalAlign=top;part=1;movable=0;resizable=0;rotatable=0;" parent="45hvBmFAHdr5WttG05ll-6" vertex="1">
@@ -49,6 +49,9 @@
         </mxCell>
         <mxCell id="45hvBmFAHdr5WttG05ll-8" value="" style="shape=rect;fillColor=#1192E8;aspect=fixed;resizable=0;labelPosition=right;verticalLabelPosition=middle;align=left;verticalAlign=middle;strokeColor=none;part=1;spacingLeft=5;fontSize=14;" parent="45hvBmFAHdr5WttG05ll-5" vertex="1">
           <mxGeometry width="4" height="48" relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="Uiqz_tAiugVHHohgR0kc-1" value="&lt;div&gt;Sanguinius&lt;br&gt;Wazuh&lt;br&gt;&lt;div&gt;IPv4: 10.0.10.x&lt;/div&gt;&lt;/div&gt;" style="verticalLabelPosition=bottom;html=1;verticalAlign=top;align=center;strokeColor=none;fillColor=#00BEF2;shape=mxgraph.azure.virtual_machine;" vertex="1" parent="45hvBmFAHdr5WttG05ll-5">
+          <mxGeometry x="40" y="50" width="50" height="40" as="geometry" />
         </mxCell>
         <mxCell id="45hvBmFAHdr5WttG05ll-37" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.25;exitY=1;exitDx=0;exitDy=0;" parent="1" source="45hvBmFAHdr5WttG05ll-13" edge="1">
           <mxGeometry relative="1" as="geometry">
