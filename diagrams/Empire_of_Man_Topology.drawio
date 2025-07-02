@@ -1,0 +1,175 @@
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36 Edg/137.0.0.0" version="27.2.0">
+  <diagram name="Page-1" id="QNzF2ZHjbEMLiULt4nLU">
+    <mxGraphModel dx="3475" dy="1063" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="45hvBmFAHdr5WttG05ll-1" value="IPv4: 192.168.4.179&lt;div&gt;Default Gateway: 192.168.4.1&lt;/div&gt;" style="image;html=1;image=img/lib/clip_art/networking/Modem_128x128.png" parent="1" vertex="1">
+          <mxGeometry x="370" y="70" width="80" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="45hvBmFAHdr5WttG05ll-2" value="" style="endArrow=none;dashed=1;html=1;dashPattern=1 3;strokeWidth=2;rounded=0;" parent="1" edge="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="409" y="270" as="sourcePoint" />
+            <mxPoint x="409" y="160" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="45hvBmFAHdr5WttG05ll-3" value="ESxi&lt;div&gt;192.168.4.40&lt;/div&gt;&lt;div&gt;x&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;" style="sketch=0;points=[[0.015,0.015,0],[0.985,0.015,0],[0.985,0.985,0],[0.015,0.985,0],[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];verticalLabelPosition=bottom;html=1;verticalAlign=top;aspect=fixed;align=center;pointerEvents=1;shape=mxgraph.cisco19.rect;prIcon=hypervisor;fillColor=#FAFAFA;strokeColor=#005073;" parent="1" vertex="1">
+          <mxGeometry x="385" y="480" width="50" height="65" as="geometry" />
+        </mxCell>
+        <mxCell id="45hvBmFAHdr5WttG05ll-9" value="" style="container=1;collapsible=0;expand=0;recursiveResize=0;html=1;whiteSpace=wrap;strokeColor=#1192E8;fillColor=none;strokeWidth=1" parent="1" vertex="1">
+          <mxGeometry x="500" y="810" width="370" height="180" as="geometry" />
+        </mxCell>
+        <mxCell id="45hvBmFAHdr5WttG05ll-10" value="Port Group: pg-custodes &#xa;VLAN ID: 100 &gt; vmnic1" style="shape=rect;fillColor=none;aspect=fixed;resizable=0;labelPosition=right;verticalLabelPosition=middle;align=left;verticalAlign=middle;strokeColor=none;part=1;spacingLeft=5;fontSize=14;" parent="45hvBmFAHdr5WttG05ll-9" vertex="1">
+          <mxGeometry width="48" height="48" relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="45hvBmFAHdr5WttG05ll-11" value="" style="fillColor=#1192E8;shape=mxgraph.ibm_cloud.vlan;strokeColor=none;dashed=0;outlineConnect=0;html=1;labelPosition=center;verticalLabelPosition=bottom;verticalAlign=top;part=1;movable=0;resizable=0;rotatable=0;" parent="45hvBmFAHdr5WttG05ll-10" vertex="1">
+          <mxGeometry width="24" height="24" relative="1" as="geometry">
+            <mxPoint x="12" y="12" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="45hvBmFAHdr5WttG05ll-12" value="" style="shape=rect;fillColor=#1192E8;aspect=fixed;resizable=0;labelPosition=right;verticalLabelPosition=middle;align=left;verticalAlign=middle;strokeColor=none;part=1;spacingLeft=5;fontSize=14;" parent="45hvBmFAHdr5WttG05ll-9" vertex="1">
+          <mxGeometry width="4" height="48" relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="45hvBmFAHdr5WttG05ll-4" value="Rogal_Dorn Firewall&lt;div&gt;192.168.4.40&lt;/div&gt;&lt;div&gt;LAN: 10.0.10.1 / pg-custodes&lt;/div&gt;&lt;div&gt;admin@10.0.10.1&lt;/div&gt;" style="image;html=1;image=img/lib/clip_art/networking/Firewall_02_128x128.png" parent="45hvBmFAHdr5WttG05ll-9" vertex="1">
+          <mxGeometry x="60" y="40" width="80" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="45hvBmFAHdr5WttG05ll-36" value="Emperor_of_Mankind&lt;div&gt;Command Node&lt;br&gt;&lt;div&gt;IPv4: 10.0.10.10&lt;/div&gt;&lt;/div&gt;" style="verticalLabelPosition=bottom;html=1;verticalAlign=top;align=center;strokeColor=none;fillColor=#00BEF2;shape=mxgraph.azure.virtual_machine;" parent="45hvBmFAHdr5WttG05ll-9" vertex="1">
+          <mxGeometry x="250" y="50" width="50" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="45hvBmFAHdr5WttG05ll-5" value="" style="container=1;collapsible=0;expand=0;recursiveResize=0;html=1;whiteSpace=wrap;strokeColor=#1192E8;fillColor=none;strokeWidth=1" parent="1" vertex="1">
+          <mxGeometry x="900" y="800" width="220" height="140" as="geometry" />
+        </mxCell>
+        <mxCell id="45hvBmFAHdr5WttG05ll-6" value="Port Group: pg-administratum &#xa;VLAN ID: 10 &gt; vmnic1" style="shape=rect;fillColor=none;aspect=fixed;resizable=0;labelPosition=right;verticalLabelPosition=middle;align=left;verticalAlign=middle;strokeColor=none;part=1;spacingLeft=5;fontSize=14;" parent="45hvBmFAHdr5WttG05ll-5" vertex="1">
+          <mxGeometry width="48" height="48" relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="45hvBmFAHdr5WttG05ll-7" value="" style="fillColor=#1192E8;shape=mxgraph.ibm_cloud.vlan;strokeColor=none;dashed=0;outlineConnect=0;html=1;labelPosition=center;verticalLabelPosition=bottom;verticalAlign=top;part=1;movable=0;resizable=0;rotatable=0;" parent="45hvBmFAHdr5WttG05ll-6" vertex="1">
+          <mxGeometry width="24" height="24" relative="1" as="geometry">
+            <mxPoint x="12" y="12" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="45hvBmFAHdr5WttG05ll-8" value="" style="shape=rect;fillColor=#1192E8;aspect=fixed;resizable=0;labelPosition=right;verticalLabelPosition=middle;align=left;verticalAlign=middle;strokeColor=none;part=1;spacingLeft=5;fontSize=14;" parent="45hvBmFAHdr5WttG05ll-5" vertex="1">
+          <mxGeometry width="4" height="48" relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="Uiqz_tAiugVHHohgR0kc-1" value="&lt;div&gt;Sanguinius&lt;br&gt;Wazuh&lt;br&gt;&lt;div&gt;IPv4: 10.0.10.x&lt;/div&gt;&lt;/div&gt;" style="verticalLabelPosition=bottom;html=1;verticalAlign=top;align=center;strokeColor=none;fillColor=#00BEF2;shape=mxgraph.azure.virtual_machine;" vertex="1" parent="45hvBmFAHdr5WttG05ll-5">
+          <mxGeometry x="40" y="50" width="50" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="45hvBmFAHdr5WttG05ll-37" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.25;exitY=1;exitDx=0;exitDy=0;" parent="1" source="45hvBmFAHdr5WttG05ll-13" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="50" y="940" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="45hvBmFAHdr5WttG05ll-13" value="" style="container=1;collapsible=0;expand=0;recursiveResize=0;html=1;whiteSpace=wrap;strokeColor=#1192E8;fillColor=none;strokeWidth=1" parent="1" vertex="1">
+          <mxGeometry x="-40" y="800" width="220" height="140" as="geometry" />
+        </mxCell>
+        <mxCell id="45hvBmFAHdr5WttG05ll-14" value="Port Group: VM Network &#xa;VLAN ID: 0" style="shape=rect;fillColor=none;aspect=fixed;resizable=0;labelPosition=right;verticalLabelPosition=middle;align=left;verticalAlign=middle;strokeColor=none;part=1;spacingLeft=5;fontSize=14;" parent="45hvBmFAHdr5WttG05ll-13" vertex="1">
+          <mxGeometry width="48" height="48" relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="45hvBmFAHdr5WttG05ll-15" value="" style="fillColor=#1192E8;shape=mxgraph.ibm_cloud.vlan;strokeColor=none;dashed=0;outlineConnect=0;html=1;labelPosition=center;verticalLabelPosition=bottom;verticalAlign=top;part=1;movable=0;resizable=0;rotatable=0;" parent="45hvBmFAHdr5WttG05ll-14" vertex="1">
+          <mxGeometry width="24" height="24" relative="1" as="geometry">
+            <mxPoint x="12" y="12" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="45hvBmFAHdr5WttG05ll-16" value="" style="shape=rect;fillColor=#1192E8;aspect=fixed;resizable=0;labelPosition=right;verticalLabelPosition=middle;align=left;verticalAlign=middle;strokeColor=none;part=1;spacingLeft=5;fontSize=14;" parent="45hvBmFAHdr5WttG05ll-13" vertex="1">
+          <mxGeometry width="4" height="48" relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="45hvBmFAHdr5WttG05ll-18" value="" style="verticalLabelPosition=bottom;html=1;verticalAlign=top;align=center;strokeColor=none;fillColor=#00BEF2;shape=mxgraph.azure.virtual_machine;" parent="45hvBmFAHdr5WttG05ll-13" vertex="1">
+          <mxGeometry x="80" y="50" width="50" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="45hvBmFAHdr5WttG05ll-19" value="Dell R640 running ESXi 8.0.2&lt;div&gt;lionsgate&lt;/div&gt;&lt;div&gt;192.168.4.1 via iDRAX&lt;/div&gt;" style="image;html=1;image=img/lib/clip_art/computers/Server_128x128.png" parent="1" vertex="1">
+          <mxGeometry x="370" y="250" width="80" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="45hvBmFAHdr5WttG05ll-20" value="" style="endArrow=none;dashed=1;html=1;dashPattern=1 3;strokeWidth=2;rounded=0;" parent="1" edge="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="409.5" y="470" as="sourcePoint" />
+            <mxPoint x="409.5" y="360" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="45hvBmFAHdr5WttG05ll-21" value="" style="endArrow=none;dashed=1;html=1;dashPattern=1 3;strokeWidth=2;rounded=0;entryX=0;entryY=0.75;entryDx=0;entryDy=0;entryPerimeter=0;" parent="1" source="45hvBmFAHdr5WttG05ll-25" target="45hvBmFAHdr5WttG05ll-3" edge="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="410" y="670" as="sourcePoint" />
+            <mxPoint x="409.5" y="600" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="45hvBmFAHdr5WttG05ll-23" value="&lt;span style=&quot;color: rgb(50, 50, 50); font-family: Metropolis; font-size: 12px; font-style: normal; font-variant-ligatures: normal; font-variant-caps: normal; font-weight: 400; letter-spacing: normal; orphans: 2; text-align: start; text-indent: 0px; text-transform: none; widows: 2; word-spacing: 0px; -webkit-text-stroke-width: 0px; white-space: normal; background-color: rgba(208, 209, 220, 0.9); text-decoration-thickness: initial; text-decoration-style: initial; text-decoration-color: initial; float: none; display: inline !important;&quot;&gt;&lt;span style=&quot;color: rgb(50, 50, 50); font-size: 17.3333px; font-weight: 700; background-color: rgba(208, 209, 220, 0.9);&quot;&gt;vmnic 0 pg-wan&amp;nbsp;&lt;/span&gt;VLAN ID: 60&amp;nbsp;&lt;/span&gt;" style="text;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="580" y="380" width="270" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="45hvBmFAHdr5WttG05ll-25" value="vSwitch0" style="pointerEvents=1;shadow=0;dashed=0;html=1;strokeColor=none;fillColor=#4495D1;labelPosition=center;verticalLabelPosition=bottom;verticalAlign=top;align=center;outlineConnect=0;shape=mxgraph.veeam.2d.virtual_switch;" parent="1" vertex="1">
+          <mxGeometry x="120" y="560" width="140" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="45hvBmFAHdr5WttG05ll-26" value="vSwitch-Palace&lt;div&gt;&lt;br&gt;&lt;/div&gt;" style="pointerEvents=1;shadow=0;dashed=0;html=1;strokeColor=none;fillColor=#4495D1;labelPosition=center;verticalLabelPosition=bottom;verticalAlign=top;align=center;outlineConnect=0;shape=mxgraph.veeam.2d.virtual_switch;" parent="1" vertex="1">
+          <mxGeometry x="550" y="560" width="140" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="45hvBmFAHdr5WttG05ll-27" value="" style="container=1;collapsible=0;expand=0;recursiveResize=0;html=1;whiteSpace=wrap;strokeColor=#1192E8;fillColor=none;strokeWidth=1" parent="1" vertex="1">
+          <mxGeometry x="-300" y="800" width="220" height="140" as="geometry" />
+        </mxCell>
+        <mxCell id="45hvBmFAHdr5WttG05ll-28" value="Port Group: pg-wan &#xa;VLAN ID: 60" style="shape=rect;fillColor=none;aspect=fixed;resizable=0;labelPosition=right;verticalLabelPosition=middle;align=left;verticalAlign=middle;strokeColor=none;part=1;spacingLeft=5;fontSize=14;" parent="45hvBmFAHdr5WttG05ll-27" vertex="1">
+          <mxGeometry width="48" height="48" relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="45hvBmFAHdr5WttG05ll-29" value="" style="fillColor=#1192E8;shape=mxgraph.ibm_cloud.vlan;strokeColor=none;dashed=0;outlineConnect=0;html=1;labelPosition=center;verticalLabelPosition=bottom;verticalAlign=top;part=1;movable=0;resizable=0;rotatable=0;" parent="45hvBmFAHdr5WttG05ll-28" vertex="1">
+          <mxGeometry width="24" height="24" relative="1" as="geometry">
+            <mxPoint x="12" y="12" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="45hvBmFAHdr5WttG05ll-30" value="" style="shape=rect;fillColor=#1192E8;aspect=fixed;resizable=0;labelPosition=right;verticalLabelPosition=middle;align=left;verticalAlign=middle;strokeColor=none;part=1;spacingLeft=5;fontSize=14;" parent="45hvBmFAHdr5WttG05ll-27" vertex="1">
+          <mxGeometry width="4" height="48" relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="45hvBmFAHdr5WttG05ll-31" value="" style="verticalLabelPosition=bottom;html=1;verticalAlign=top;align=center;strokeColor=none;fillColor=#00BEF2;shape=mxgraph.azure.virtual_machine;" parent="45hvBmFAHdr5WttG05ll-27" vertex="1">
+          <mxGeometry x="80" y="50" width="50" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="45hvBmFAHdr5WttG05ll-32" value="" style="container=1;collapsible=0;expand=0;recursiveResize=0;html=1;whiteSpace=wrap;strokeColor=#1192E8;fillColor=none;strokeWidth=1" parent="1" vertex="1">
+          <mxGeometry x="220" y="800" width="220" height="140" as="geometry" />
+        </mxCell>
+        <mxCell id="45hvBmFAHdr5WttG05ll-33" value="Port Group: Management Network &#xa;VLAN ID: 0" style="shape=rect;fillColor=none;aspect=fixed;resizable=0;labelPosition=right;verticalLabelPosition=middle;align=left;verticalAlign=middle;strokeColor=none;part=1;spacingLeft=5;fontSize=14;" parent="45hvBmFAHdr5WttG05ll-32" vertex="1">
+          <mxGeometry width="48" height="48" relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="45hvBmFAHdr5WttG05ll-34" value="" style="fillColor=#1192E8;shape=mxgraph.ibm_cloud.vlan;strokeColor=none;dashed=0;outlineConnect=0;html=1;labelPosition=center;verticalLabelPosition=bottom;verticalAlign=top;part=1;movable=0;resizable=0;rotatable=0;" parent="45hvBmFAHdr5WttG05ll-33" vertex="1">
+          <mxGeometry width="24" height="24" relative="1" as="geometry">
+            <mxPoint x="12" y="12" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="45hvBmFAHdr5WttG05ll-35" value="" style="shape=rect;fillColor=#1192E8;aspect=fixed;resizable=0;labelPosition=right;verticalLabelPosition=middle;align=left;verticalAlign=middle;strokeColor=none;part=1;spacingLeft=5;fontSize=14;" parent="45hvBmFAHdr5WttG05ll-32" vertex="1">
+          <mxGeometry width="4" height="48" relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="45hvBmFAHdr5WttG05ll-39" value="" style="verticalLabelPosition=bottom;html=1;verticalAlign=top;align=center;strokeColor=none;fillColor=#00BEF2;shape=mxgraph.azure.virtual_machine;" parent="1" vertex="1">
+          <mxGeometry x="310" y="860" width="50" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="45hvBmFAHdr5WttG05ll-40" value="" style="endArrow=none;dashed=1;html=1;dashPattern=1 3;strokeWidth=2;rounded=0;exitX=0.5;exitY=0;exitDx=0;exitDy=0;" parent="1" source="45hvBmFAHdr5WttG05ll-27" edge="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="120.5" y="740" as="sourcePoint" />
+            <mxPoint x="120" y="670" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="45hvBmFAHdr5WttG05ll-41" value="" style="endArrow=none;dashed=1;html=1;dashPattern=1 3;strokeWidth=2;rounded=0;exitX=0.5;exitY=0;exitDx=0;exitDy=0;" parent="1" source="45hvBmFAHdr5WttG05ll-13" edge="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="-120" y="810" as="sourcePoint" />
+            <mxPoint x="190" y="680" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="45hvBmFAHdr5WttG05ll-42" value="" style="endArrow=none;dashed=1;html=1;dashPattern=1 3;strokeWidth=2;rounded=0;exitX=0.5;exitY=0;exitDx=0;exitDy=0;" parent="1" target="45hvBmFAHdr5WttG05ll-25" edge="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="320" y="800" as="sourcePoint" />
+            <mxPoint x="440" y="680" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="45hvBmFAHdr5WttG05ll-43" value="" style="endArrow=none;dashed=1;html=1;dashPattern=1 3;strokeWidth=2;rounded=0;" parent="1" source="45hvBmFAHdr5WttG05ll-3" target="45hvBmFAHdr5WttG05ll-26" edge="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="270" y="624" as="sourcePoint" />
+            <mxPoint x="419.5" y="610" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="45hvBmFAHdr5WttG05ll-44" value="" style="endArrow=none;dashed=1;html=1;dashPattern=1 3;strokeWidth=2;rounded=0;entryX=0.531;entryY=-0.015;entryDx=0;entryDy=0;entryPerimeter=0;" parent="1" target="45hvBmFAHdr5WttG05ll-9" edge="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="610" y="680" as="sourcePoint" />
+            <mxPoint x="725" y="739" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="45hvBmFAHdr5WttG05ll-45" value="" style="endArrow=none;dashed=1;html=1;dashPattern=1 3;strokeWidth=2;rounded=0;entryX=0.555;entryY=0.024;entryDx=0;entryDy=0;entryPerimeter=0;" parent="1" target="45hvBmFAHdr5WttG05ll-5" edge="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="690" y="680" as="sourcePoint" />
+            <mxPoint x="786" y="797" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

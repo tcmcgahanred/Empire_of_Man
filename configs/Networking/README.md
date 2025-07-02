@@ -1,9 +1,7 @@
 ## 🔐 Segmentation Strategy
 
-| VLAN ID | Port Group     | Purpose                        |
-|---------|----------------|--------------------------------|
-| 10      | PG-VLAN10      | SOC core services              |
-| 60      | PG-WAN         | WAN uplink to Eero             |
-| 100     | PG-Custodes    | Admin-only command VLAN        |
-
-Traffic segmentation and isolation enforced by `Rogal_Dorn` (pfSense). VLANs are not bridged unless explicitly routed.
+| Port Group Name    | VLAN ID | Purpose                                      | Assigned Systems                                                            |
+| ------------------ | ------- | -------------------------------------------- | --------------------------------------------------------------------------- |
+| `pg-wan`           | 60      | External ingress/egress interface (WAN)      | `Rogal_Dorn` (WAN interface)                                                |
+| `pg-custodes`      | 100     | Command, control, and routing infrastructure | `Rogal_Dorn` (LAN), `Emperor_of_Mankind` (admin node)                       |
+| `pg-administratum` | 10      | Security appliance & log processing network  | `Sanguinius` (Wazuh Manager), future: `Security Onion`, `TheHive`, `Cortex` |
