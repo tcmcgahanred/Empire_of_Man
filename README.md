@@ -1,5 +1,3 @@
-![alt text](TYML4855.JPG)> 
-
 **Security Notice:**  
 
 > This documentation references internal-only, non-routable IP addresses and placeholder configurations. No live infrastructure or internet-facing systems are exposed through this repository.
