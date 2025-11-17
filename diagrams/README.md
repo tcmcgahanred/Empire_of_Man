@@ -1,3 +1,4 @@
 made with https://app.diagrams.net/
 
-![alt text](Empire_of_Man_Topology.png-1.png)
+![alt text](<img width="1571" height="999" alt="image" src="https://github.com/user-attachments/assets/273cdc54-6d6b-4fb9-bd14-33714bf1614a" />
+)
