@@ -720,3 +720,131 @@ Root causes, in order discovered:
   resume/interview material, not a production MSSP — re-evaluate broader
   SOCaaS ambitions no sooner than 1+ year from the 2026-06-17 rescope
   decision.
+
+---
+
+## [2026-06-19] Naming Convention Update — Host Designations
+
+Established formal Warhammer 40K-themed names for the two physical
+hosts going forward, to keep documentation and conversation consistent:
+
+- **EoM ("Empire of Man")** — the Dell R640. Centralized/persistent
+  analytical infrastructure: Guilliman (Wazuh), Rogal_Dorn (pfSense,
+  with WireGuard), future Suricata VM, future Security Onion.
+- **VS ("Vengeful Spirit")** — the Lenovo laptop. Named for Horus's
+  Gloriana-class flagship (confirmed via web search — not to be confused
+  with "The Invincible Reason," which is actually Roboute Guilliman's
+  flagship). Mobile/disposable infrastructure: Horus (Win10 target),
+  future Kali VM, future additional targets.
+
+### Confirmed Next Tasks (carried forward from Session 7/8 decisions)
+1. Push analytical solutions (Guilliman, future Suricata VM) to EoM
+2. Implement remote access capability via WireGuard on Rogal_Dorn (EoM)
+3. Install Kali on VS (Lenovo)
+
+---
+
+## [2026-06-19/20] Session 9 — Kali on VS, Cursor Bug Resolved
+
+### Kali Linux — Installed on VS (Lenovo)
+- Downloaded the official **prebuilt Kali VMware image** (kali.org/get-kali
+  → Virtual Machines tab) rather than doing a manual ISO install — much
+  faster, boots straight to a working desktop with the full standard
+  toolset preinstalled (Metasploit, nmap, Burp, etc.)
+- Default credentials: `kali` / `kali` — flagged to change via `passwd`
+- Ran full system update:
+  ```bash
+  sudo apt update && sudo apt full-upgrade -y
+  ```
+- Installed VMware Tools equivalent:
+  ```bash
+  sudo apt install open-vm-tools open-vm-tools-desktop -y
+  ```
+
+### Issue — Invisible Cursor + Severe Lag
+- VM cursor was completely invisible (though clicking/input still worked
+  — confirmed as a rendering issue, not a true input failure).
+- Initial troubleshooting (3D acceleration toggle, display mode switch,
+  service status checks, full system upgrade) did not resolve it.
+- **Root cause #1 (performance/lag):** the Kali VM was running from a
+  **OneDrive-synced folder** rather than local disk — same root cause
+  pattern as the ISO-mounting issue hit during the R640/ESXi rebuild
+  (Session 8). **Fix:** shut down VM, moved the VM folder to a local
+  `C:\` path alongside Horus/Guilliman, unregistered and re-added the VM
+  in VMware Workstation from the new location. Resolved the lag.
+- **Root cause #2 (invisible cursor, persisted after the OneDrive fix):**
+  outdated **virtual hardware compatibility version** on the VM. The
+  in-app toggle for "Accelerate 3D graphics" was inaccessible/grayed out,
+  which in retrospect was likely a symptom of the same underlying
+  compatibility mismatch. **Fix: upgraded the VM's hardware compatibility
+  version to the most recent available in VMware Workstation** — this
+  fully resolved the cursor issue with no further changes needed.
+
+### Naming Note (carried from prior session)
+- Decided to rename the Win10 target VM from **Horus** to **Isstvan III**
+  (the planet Horus virus-bombed at the start of the Horus Heresy — a
+  better thematic fit for a victim/target machine than Horus itself,
+  which is now understood to be better suited to an attacker role).
+  Rename not yet executed — flagged as a backlog item, since it requires
+  updating the VM label, the Windows hostname, and the Wazuh agent
+  registration to stay consistent (currently shows as "Horus" in the
+  Guilliman dashboard).
+
+### Lessons Learned (Session 9)
+- **Never run a VM's working files from a cloud-sync folder
+  (OneDrive/Dropbox/etc.)** — causes severe performance degradation.
+  Always store VMs on a local-only path. This is now the second time
+  this exact mistake has caused a real problem (previously: ISO mounting
+  for the R640 ESXi reinstall in Session 8).
+- **An outdated VM hardware compatibility version can manifest as a
+  seemingly unrelated display bug** (invisible cursor) rather than an
+  obvious compatibility error — when a Linux guest has cursor/SVGA
+  rendering issues in VMware Workstation, check/upgrade the hardware
+  compatibility version as a primary troubleshooting step, not a last
+  resort.
+
+### Open Items / Next Session
+- [x ] Change Kali's default password (`passwd`)
+- [ ] Note Kali's IP address for future reference
+- [ ] Execute the Horus → Isstvan III rename (VM label, Windows hostname,
+      Wazuh agent re-registration)
+- [ ] Begin Rogal_Dorn (pfSense) rebuild on EoM (R640)
+- [ ] Configure WireGuard on Rogal_Dorn once built
+- [ ] Migrate/rebuild Guilliman (Wazuh) onto EoM
+
+## [2026-06-20] Session 10 — Horus → Isstvan III Rename Completed
+
+### Summary
+Completed the full rename from "Horus" to "Isstvan III" across every layer — VM label, Windows hostname, local user account, and Wazuh agent registration — resolving the inconsistency flagged in Session 9.
+
+### Steps Completed
+1. **VMware Tools installed** on the VM before the rename/reboot pass (had not been confirmed installed previously under the old name).
+2. **VM label** renamed in VMware Workstation to `Isstvan_III`.
+3. **Local Windows user account** renamed:
+   ```powershell
+   Rename-LocalUser -Name "horus" -NewName "isstvan_3"
+   ```
+   (Underlying profile folder path unchanged, as expected — cosmetic account rename only.)
+4. **Windows hostname** renamed via:
+   ```powershell
+   Rename-Computer -NewName "Isstvan_III" -Restart
+   ```
+5. **Old Wazuh agent entry removed** from Guilliman via CLI (dashboard UI did not expose a delete option in this version/view):
+   ```bash
+   sudo /var/ossec/bin/manage_agents
+   ```
+   Selected the interactive "remove an agent" option, removed the old "Horus" registration by agent ID.
+6. **New Wazuh agent deployed** fresh from the dashboard (Server Management → Endpoint Summary → Deploy new agent), this time registered as **Isstvan_III**, server address `192.168.76.132`. Confirmed **Active** status in the dashboard.
+
+### Keeper Vault
+- Updated the corresponding entry: title/labels changed to "Isstvan III (formerly Horus)", username field updated to match the renamed local account. Password unchanged.
+
+### Current State
+- VM, Windows hostname, local user account, and Wazuh agent registration are now **fully consistent** under the name **Isstvan III** — no remaining references to "Horus" anywhere in active tooling.
+
+### Open Items / Next Session
+- [ ] Begin Rogal_Dorn (pfSense) rebuild on EoM (R640)
+- [ ] Configure WireGuard on Rogal_Dorn once built
+- [ ] Migrate/rebuild Guilliman (Wazuh) onto EoM
+- [ ] Change Kali's default password (`passwd`) — still outstanding from Session 9
+- [ ] Note Kali's IP address for future reference
