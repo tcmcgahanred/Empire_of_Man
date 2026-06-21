@@ -804,7 +804,7 @@ hosts going forward, to keep documentation and conversation consistent:
   resort.
 
 ### Open Items / Next Session
-- [x ] Change Kali's default password (`passwd`)
+- [ ] Change Kali's default password (`passwd`)
 - [ ] Note Kali's IP address for future reference
 - [ ] Execute the Horus → Isstvan III rename (VM label, Windows hostname,
       Wazuh agent re-registration)
@@ -812,35 +812,50 @@ hosts going forward, to keep documentation and conversation consistent:
 - [ ] Configure WireGuard on Rogal_Dorn once built
 - [ ] Migrate/rebuild Guilliman (Wazuh) onto EoM
 
+---
+
 ## [2026-06-20] Session 10 — Horus → Isstvan III Rename Completed
 
 ### Summary
-Completed the full rename from "Horus" to "Isstvan III" across every layer — VM label, Windows hostname, local user account, and Wazuh agent registration — resolving the inconsistency flagged in Session 9.
+Completed the full rename from "Horus" to "Isstvan III" across every
+layer — VM label, Windows hostname, local user account, and Wazuh agent
+registration — resolving the inconsistency flagged in Session 9.
 
 ### Steps Completed
-1. **VMware Tools installed** on the VM before the rename/reboot pass (had not been confirmed installed previously under the old name).
+1. **VMware Tools installed** on the VM before the rename/reboot pass
+   (had not been confirmed installed previously under the old name).
 2. **VM label** renamed in VMware Workstation to `Isstvan_III`.
 3. **Local Windows user account** renamed:
    ```powershell
    Rename-LocalUser -Name "horus" -NewName "isstvan_3"
    ```
-   (Underlying profile folder path unchanged, as expected — cosmetic account rename only.)
+   (Underlying profile folder path unchanged, as expected — cosmetic
+   account rename only.)
 4. **Windows hostname** renamed via:
    ```powershell
    Rename-Computer -NewName "Isstvan_III" -Restart
    ```
-5. **Old Wazuh agent entry removed** from Guilliman via CLI (dashboard UI did not expose a delete option in this version/view):
+5. **Old Wazuh agent entry removed** from Guilliman via CLI (dashboard
+   UI did not expose a delete option in this version/view):
    ```bash
    sudo /var/ossec/bin/manage_agents
    ```
-   Selected the interactive "remove an agent" option, removed the old "Horus" registration by agent ID.
-6. **New Wazuh agent deployed** fresh from the dashboard (Server Management → Endpoint Summary → Deploy new agent), this time registered as **Isstvan_III**, server address `192.168.76.132`. Confirmed **Active** status in the dashboard.
+   Selected the interactive "remove an agent" option, removed the old
+   "Horus" registration by agent ID.
+6. **New Wazuh agent deployed** fresh from the dashboard (Server
+   Management → Endpoint Summary → Deploy new agent), this time
+   registered as **Isstvan_III**, server address `192.168.76.132`.
+   Confirmed **Active** status in the dashboard.
 
 ### Keeper Vault
-- Updated the corresponding entry: title/labels changed to "Isstvan III (formerly Horus)", username field updated to match the renamed local account. Password unchanged.
+- Updated the corresponding entry: title/labels changed to "Isstvan III
+  (formerly Horus)", username field updated to match the renamed local
+  account. Password unchanged.
 
 ### Current State
-- VM, Windows hostname, local user account, and Wazuh agent registration are now **fully consistent** under the name **Isstvan III** — no remaining references to "Horus" anywhere in active tooling.
+- VM, Windows hostname, local user account, and Wazuh agent registration
+  are now **fully consistent** under the name **Isstvan III** — no
+  remaining references to "Horus" anywhere in active tooling.
 
 ### Open Items / Next Session
 - [ ] Begin Rogal_Dorn (pfSense) rebuild on EoM (R640)
