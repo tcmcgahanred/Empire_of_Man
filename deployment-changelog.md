@@ -863,3 +863,246 @@ registration — resolving the inconsistency flagged in Session 9.
 - [ ] Migrate/rebuild Guilliman (Wazuh) onto EoM
 - [ ] Change Kali's default password (`passwd`) — still outstanding from Session 9
 - [ ] Note Kali's IP address for future reference
+
+## [2026-06-27] Session 11 — ESXi Daily-Driver Account, Rogal_Dorn VM Built, Security Onion Planning
+
+### Summary
+Created a non-root daily-driver account on the rebuilt EoM ESXi host.
+Built the Rogal_Dorn (pfSense) VM from scratch on EoM with three NICs,
+created a new internal vSwitch and two VLAN-tagged port groups, and
+wired Rogal_Dorn's NICs to them. Decided Security Onion will be a third
+EoM appliance, named **Valdor**, and that it will get its own dedicated
+VLAN separate from Guilliman rather than sharing one with it. Also
+explored (and deferred) several architectural questions: EC2 as a
+WireGuard relay, dedicated pfSense hardware (Netgate 1100), and AD/
+BloodHound placement.
+
+### ESXi Daily-Driver Account
+- Confirmed the rebuilt EoM ESXi host is reachable at an IP in the
+  `192.168.245.x` range (DHCP-assigned post-reinstall) — distinct from
+  the old static `192.168.4.40` ("Lionsgate") used pre-wipe.
+- Logged in as `root` (password recovered — matched the iDRAC `root`
+  credential, consistent with the credential-reuse issue flagged in
+  Session 8).
+- Created a new non-root local ESXi user via **Manage → Security &
+  Users → Users → Add user**, with shell/SSH access enabled at creation
+  time (checkbox option present in this ESXi version's "Add user" flow).
+- Assigned the new account **Administrator** role at the host level
+  (via Manage → Security & Users → Permissions → Add — exact tab/path
+  may vary by ESXi build; Tim located it under "Roles"/user-level
+  assignment in this version's UI).
+- Decision: full Administrator rights for this single daily-driver
+  account were judged acceptable for this lab context (single operator,
+  no separation-of-duties need), rather than building a more
+  least-privilege-scoped role. `root` is reserved for break-glass use
+  only going forward, per the Session 8 lesson learned.
+- **Backlog item closed:** "Create dedicated ESXi admin user account."
+
+### pfSense ISO Acquisition
+- Downloaded pfSense **CE (Community Edition), AMD64** architecture
+  from pfsense.org/download (AMD64 is the standard 64-bit x86
+  architecture designation, not AMD-specific — covers both AMD and
+  Intel CPUs).
+- Uploaded to `datastore1` via Host Client (Storage → datastore1 →
+  Datastore browser → Upload). Uploaded twice by accident — duplicate
+  ISO left in datastore, flagged for later cleanup, no functional impact.
+
+### Rogal_Dorn VM — Created
+- **Virtual Machines → Create/Register VM → Create a new virtual
+  machine**
+- Name: `Rogal_Dorn`
+- Guest OS family: Other — Guest OS version: FreeBSD (closest match
+  available; current pfSense CE 2.7.x is based on FreeBSD 14, exact
+  FreeBSD 14 option may not have been listed in the dropdown)
+- Compatibility: **ESXi 8.0 U2 virtual machine** (the available option
+  in this ESXi 8.0U3e host's create-VM dropdown; fully compatible with
+  the U3e host)
+- Memory type: Standard (not Persistent Memory/PMem — PMem is for
+  specialized NVDIMM hardware, not applicable here)
+- **Virtual hardware:**
+  - 2 vCPU
+  - 2 GB RAM
+  - 20 GB thin-provisioned disk
+  - Default SCSI controller
+  - CD/DVD Drive: Datastore ISO file → pfSense CE AMD64 ISO on
+    `datastore1`
+  - **3 network adapters** (all initially defaulted to "VM Network" on
+    creation)
+
+### Networking — vSwitch and Port Groups Rebuilt
+- Confirmed EoM's `vSwitch0` has two default port groups:
+  - **Management Network** — ESXi host management traffic only (what
+    the Host Client itself is reached through)
+  - **VM Network** — default VM-facing port group, shares the same
+    physical uplink (`vmnic0` → Eero) as Management Network, but is
+    logically separate and is the correct port group for VM traffic
+    needing external connectivity
+- Created new internal vSwitch: **`vSwitch-palace`** — no physical
+  uplink (internal-only, VM-to-VM traffic exclusively; cannot reach the
+  physical network or internet directly).
+- Created two VLAN-tagged port groups on `vSwitch-palace`:
+  - **`PG-Guilliman`** — VLAN ID 20 — for the Wazuh VM once migrated to
+    EoM
+  - **`PG-Valdor`** — VLAN ID 30 — for the planned Security Onion VM
+    (named Valdor, see below)
+- **Decision:** Guilliman and Valdor (Security Onion) will NOT share a
+  VLAN. Discussed pros/cons of shared vs. per-appliance VLANs for
+  security tooling specifically — concluded that even though both are
+  trusted, single-operator-controlled defensive tools, segmenting them
+  limits blast radius if either is ever compromised (a documented
+  general security-architecture rationale for treating security tooling
+  as a high-value target), and demonstrates the stronger-practice
+  pattern relevant to Tim's advisory work. Decided in favor of
+  separation despite the added complexity, with Rogal_Dorn explicitly
+  prioritized to get built and working first.
+- **Rogal_Dorn NIC assignments finalized:**
+  - NIC 1 (WAN) → `VM Network` (internet/Eero-facing; WireGuard will
+    listen here once configured)
+  - NIC 2 → `PG-Guilliman` (VLAN 20)
+  - NIC 3 → `PG-Valdor` (VLAN 30)
+- Explicitly decided **not** to build `PG-VLAN10` (originally planned
+  for generic "lab client" VMs) at this time, since none of the three
+  currently-planned EoM VMs (Rogal_Dorn, Guilliman, Valdor) are client
+  machines. Revisit if/when a client-type VM (e.g., the planned AD DC)
+  is placed on EoM.
+
+### Security Onion VM — Named, Not Yet Built
+- Decided Security Onion will be the third planned EoM appliance.
+- Confirmed (recalling Session 7 notes) that Security Onion bundles
+  Suricata and Zeek internally — no separate standalone Suricata
+  install needed if Security Onion is deployed.
+- **Named: Valdor** (Constantin Valdor, Captain-General of the Adeptus
+  Custodes — thematically fits a network-security-monitoring platform
+  that watches over the network the way Valdor watches over the
+  Emperor). VM not yet built — full Standalone hardware spec (24GB+
+  RAM, 4+ CPU, 200GB+ storage) still applies per the original Session 7
+  sizing notes.
+
+### Architectural Concepts Clarified This Session
+- **vSwitch vs. router:** a vSwitch is Layer 2 only (switching, no
+  routing/IP awareness) — Rogal_Dorn (pfSense) is the actual router,
+  with a leg in multiple vSwitch/port-group segments at once to bridge
+  and firewall between them. ESXi has no native "vRouter" object;
+  routing is always done by a VM (here, pfSense) plugged into multiple
+  networks.
+- **vmnic naming:** `vmnic0`, `vmnic1`, etc. refer to **physical** NICs
+  on the R640 as seen from within ESXi — not virtual adapters, despite
+  the "vm" prefix. The actually-virtual adapter is the VM's own network
+  adapter/vNIC, configured per-VM.
+- **VM Network vs. Management Network:** both are port groups on the
+  same `vSwitch0`/physical uplink, logically separated for traffic-type
+  clarity (host management vs. VM traffic), not separate physical paths
+  in this single-NIC-uplink setup.
+- **vCenter / vMotion / Distributed vSwitch dependency chain:** vCenter
+  is required for both vMotion (live VM migration between hosts) and
+  Distributed vSwitches (a vSwitch construct that spans multiple ESXi
+  hosts). None of these apply to Tim's current single-host, no-vCenter
+  EoM setup. A Standard vSwitch (what EoM uses) is host-local only and
+  does not span hosts.
+- **Internal vs. external traffic paths confirmed:** VM-to-VM traffic
+  between two internal VLANs (e.g., Guilliman ↔ Valdor) stays entirely
+  within ESXi, routed only through Rogal_Dorn's internal NICs — it never
+  touches `vmnic0`. Only traffic actually entering/leaving EoM's network
+  (e.g., internet access, the inbound WireGuard tunnel from VS) uses
+  `vmnic0`.
+- **Lateral movement / segmentation rationale discussed:** VLAN
+  segmentation behind a routing/firewalling chokepoint (Rogal_Dorn) is
+  the mitigation for uncontrolled lateral movement, not an instance of
+  it — traffic between VLANs must pass through and can be inspected/
+  filtered by pfSense, unlike a flat unsegmented network.
+
+### Other Decisions Made This Session
+- **EC2 WireGuard relay** — discussed in depth as a way to solve the
+  "no inbound access while away from home" chicken-and-egg problem
+  (both VS and Rogal_Dorn would dial outbound to a small EC2 instance
+  acting as a relay, avoiding any need for port-forwarding on the
+  Eero). Real pros: solves the lockout problem permanently, cheap
+  ($0–5/mo), adds genuine cloud/AWS security-engineering reps. Real
+  cons: third box to patch/maintain/pay for, becomes an internet-facing
+  entry point if misconfigured, added WireGuard routing complexity
+  (3-peer relay vs. 2-peer direct). **Decision: explicitly deferred**
+  until the core on-prem lab (Rogal_Dorn, direct WireGuard, Guilliman
+  migration, AD/BloodHound) is stable and working well.
+- **Dedicated pfSense hardware (Netgate appliances)** researched via
+  Netgate's product page. **Netgate 1100** ($269) selected as the
+  appliance of interest: dual-core ARM Cortex-A53 1.2GHz, 1GB DDR4 RAM,
+  10.6GB eMMC storage, 3x GbE ports, ~3.48W idle power draw, native
+  WireGuard/OpenVPN/IPsec support, 927 Mbps L3 forwarding / 607 Mbps
+  firewall throughput / 247 Mbps IPsec VPN throughput per Netgate's
+  published performance figures.
+  - **Planned placement:** between the Eero and the existing office
+    switch (Modem → Eero → Netgate 1100 → switch → EoM/VS), making the
+    1100 the new network edge for both hosts rather than Rogal_Dorn
+    running as a VM on EoM.
+  - **Open items if/when pursued:** decide DHCP vs. static IP handling
+    once the 1100 is in place; decide whether to decommission the
+    Rogal_Dorn VM entirely or repurpose it as an internal-only VLAN
+    router behind the 1100; note that VS would then also pass through
+    the 1100 (acting as plain router/switch for VS, not enforcing
+    pfSense rules on it specifically unless desired).
+  - **Decision: this is a deferred/later-phase item**, not blocking the
+    current Rogal_Dorn VM build. Tim explicitly chose to proceed with
+    Rogal_Dorn as a VM on EoM now rather than wait for the hardware.
+- **Reverse shell / reverse SSH tunnel** discussed as a potential
+  WireGuard substitute — concluded reverse shells are one-shot,
+  unencrypted attacker payloads with no persistence or multi-host
+  routing, not viable infrastructure. Reverse SSH tunnels (`ssh -R`) are
+  a legitimate persistent/encrypted alternative, but still require a
+  publicly-reachable relay box (i.e., the same EC2 dependency as the
+  WireGuard relay option) and are strictly less capable than WireGuard
+  for routing whole subnets to multiple internal hosts at once. No
+  change to the WireGuard-based plan as a result.
+- **PIA (commercial VPN) clarified as unrelated** to home-network remote
+  access — PIA uses WireGuard as a protocol but is an outbound-only
+  privacy service with no relationship to Rogal_Dorn or EoM; using the
+  same protocol does not create a tunnel between unrelated endpoints.
+- **AD Domain Controller placement confirmed:** a new, separate Windows
+  Server VM (not Isstvan_III, which is Windows 10 Pro and cannot run AD
+  DS) will serve as the domain controller, built on **EoM** per Tim's
+  stated preference for centralizing "heavy" infrastructure there.
+  Isstvan_III will join the domain as a client for BloodHound testing
+  purposes. Edition not yet chosen (Windows Server 2022 Evaluation
+  suggested as a free option, not yet confirmed).
+- **Lord_Commander_Guilliman (current VS instance) confirmed for
+  decommission** once Guilliman is rebuilt fresh on EoM — no data on
+  the VS instance considered worth preserving.
+
+### VM Naming Corrections (carried into this session)
+- Clarified current naming, per Tim: **Horus** = Kali Linux (attacker,
+  on VS) — this is the VM that was *originally* going to be renamed to
+  Isstvan III per Session 9/10 notes, but Tim's restated mapping this
+  session keeps Horus as the Kali VM name. **Isstvan_III** = Win10
+  target (on VS). **Lord_Commander_Guilliman** = Ubuntu/Wazuh (currently
+  on VS, scheduled for migration/rebuild on EoM).
+  - Note: this differs from the Session 10 log, which recorded a
+    completed rename of the Win10 target VM from "Horus" to
+    "Isstvan_III" (i.e., Horus and Isstvan_III were the same VM,
+    renamed). Tim's description this session treats Horus and
+    Isstvan_III as two distinct, separate VMs (Kali and Win10
+    respectively). This discrepancy has not been independently
+    verified or reconciled — flagged here rather than assumed; worth
+    confirming actual current VM names/roles on VS directly next time
+    they're accessible, rather than relying on changelog history alone.
+
+### Open Items / Next Session
+- [ ] Power on Rogal_Dorn and run the pfSense installer (partitioning,
+      initial install)
+- [ ] Initial pfSense interface assignment (WAN/LAN/OPT1 matching the
+      three NICs and their port groups)
+- [ ] Configure WireGuard on Rogal_Dorn once pfSense install is complete
+- [ ] Delete duplicate pfSense ISO from datastore1
+- [ ] Verify/reconcile actual current VM names and roles on VS (Horus /
+      Isstvan_III discrepancy noted above)
+- [ ] Build Valdor (Security Onion) VM once Rogal_Dorn is stable —
+      full Standalone spec, on `PG-Valdor` (VLAN 30)
+- [ ] Migrate/rebuild Guilliman onto EoM, on `PG-Guilliman` (VLAN 20)
+- [ ] Re-point Isstvan_III's Wazuh agent to new EoM Guilliman IP after
+      migration
+- [ ] Decommission Lord_Commander_Guilliman on VS once EoM rebuild is
+      confirmed working
+- [ ] Stand up new Windows Server VM (AD DC) on EoM; join Isstvan_III to
+      the domain; run BloodHound from EoM or Horus/Kali against it
+- [ ] (Deferred, later phase) Evaluate Netgate 1100 as dedicated pfSense
+      hardware, placed between Eero and office switch
+- [ ] (Deferred, later phase) EC2 WireGuard relay for remote access when
+      away from home with no port-forward path
