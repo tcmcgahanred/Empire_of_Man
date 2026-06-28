@@ -14,7 +14,7 @@ removed, only reorganized and duplicate sections collapsed.
 
 ### Hardware / Firmware
 - Mounted Dell PowerEdge R640 into Vevor open-frame rack
-- Service Tag: `GKSH1S2`
+- Service Tag: `[REDACTED — see local notes]`
 - iDRAC9 configured via USB — static IP `192.168.4.120/24`, gateway `192.168.4.1`
 - Firmware updated via iDRAC:
   - SAS-RAID: `SAS-RAID_Firmware_700GG_WN64_25.5.9.0001_A17_01`
@@ -629,7 +629,7 @@ per prior decision.
   "Evaluation/Paid" build exists under a different build number —
   `24674464` — which does require a separate key; `24677879` does not.)
 - Confirmed post-install under Manage → Licensing: **vSphere 8
-  Hypervisor, Key `J52V8-8V10M-28PA1-L2RA2-2HY6U`, Expiration: Never.**
+  Hypervisor, Key `[REDACTED — see password manager]`, Expiration: Never.**
 
 ### Boot/Install Troubleshooting (iDRAC Virtual Media)
 Root causes, in order discovered:
@@ -1160,3 +1160,188 @@ Continued directly from the DNS troubleshooting earlier in Session 11. Built a K
 - [ ] Decommission Lord_Commander_Guilliman on VS
 - [ ] Stand up AD DC, join Isstvan_III, run BloodHound
 - [ ] (Deferred) Evaluate Netgate 1100 hardware
+
+## [2026-06-27] Session 11 (continued) — Eye_of_Terror EC2 Relay Built, Remote Access Working End-to-End
+
+### Summary
+Built a small EC2 instance (**Eye_of_Terror**) to serve as a WireGuard
+relay, resolving the CGNAT blocker identified earlier in Session 11.
+Reconfigured Rogal_Dorn and VS to dial outbound to the relay instead of
+attempting a direct peer-to-peer connection. After several rounds of
+troubleshooting (a misconfigured AWS security group, a peer entry
+mistakenly pointed at its own public key instead of the relay's, a
+missing pfSense interface assignment/firewall rule, and a missing IP
+address on the resulting OPT2 interface), confirmed full end-to-end
+connectivity: **VS → Eye_of_Terror → Rogal_Dorn → PG-Guilliman**. This
+is the first working remote-access path into EoM from outside the home
+network.
+
+### Alternatives Considered Before Settling on EC2
+- **Tailscale** researched as a no-VPS alternative (built on WireGuard,
+  automatic NAT/CGNAT traversal via DERP relays). Confirmed via search
+  that Tailscale is not directly interoperable with a standard WireGuard
+  peer — it would require replacing the manually-configured WireGuard
+  setup entirely with the Tailscale client/daemon on each host, not
+  adding to it.
+- **NordVPN / commercial consumer VPNs** confirmed not applicable —
+  outbound-only privacy services with no mechanism for inbound tunnels
+  into a home network, regardless of which protocol they use
+  internally.
+- **Decision:** proceeded with a self-hosted EC2 relay over Tailscale,
+  citing preference for keeping WireGuard (already configured) and
+  avoiding a third-party coordination/control-plane service for this
+  specific use case, despite Tailscale being the lower-effort option.
+
+### Eye_of_Terror — EC2 Instance Built
+- **Instance type:** t3.micro (free-tier eligible), Ubuntu Server 26.04
+  LTS, region us-east-2.
+- **Named: Eye_of_Terror** (the Warp rift housing the Cadian Gate —
+  fits a stable, always-open access point). The WireGuard tunnel itself
+  was informally referred to as "the Warp" going forward, alongside its
+  existing pfSense-side label of "Webway." Key pair named
+  **Ritual_of_Astro_Navigation** (a Navigator rite for plotting warp
+  travel coordinates — confirmed via search as a real, accurate lore
+  reference, fitting the key's function of "finding the way through").
+  Tim noted **Cadian_Gate** as a reserved name for a possible future
+  second EC2 instance (a "defender box" concept, not yet built).
+- **First launch attempt failed and was discarded:** the initial key
+  pair's `.pem` file download silently failed (browser showed an
+  incomplete `Unconfirmed####.crdownload` file, easily mistaken for a
+  successful download). Since AWS only allows downloading a key pair's
+  private key once, at creation, the orphaned key pair was unusable.
+  Resolved by terminating the first instance, releasing its Elastic IP,
+  and relaunching clean with a new key pair, confirming the `.pem`
+  download completed fully before proceeding.
+- **Final instance:** Elastic IP allocated and attached:
+  **`[REDACTED-PUBLIC-IP — see local notes]`** (replacing the ephemeral default public IP).
+- **Security group:** SSH (22) and Custom UDP (51820), both source
+  0.0.0.0/0. Decided against IP-restricting SSH given Tim's home
+  connection is behind CGNAT (the "public IP" visible to AWS would be
+  the ISP's shared NAT gateway, not reliably Tim's alone, and subject to
+  change) — relying on SSH key-only authentication as the actual
+  security boundary instead.
+  - **Mid-session incident:** while adding the UDP/51820 rule, the
+    existing SSH rule was accidentally overwritten rather than added
+    alongside it (clicked into the existing rule's edit view instead of
+    "Add rule"), briefly locking out both SSH and EC2 Instance Connect
+    access. Diagnosed by checking the security group's actual rule list
+    directly rather than assuming the cause, and resolved by re-adding
+    the SSH rule. Both rules confirmed present afterward.
+- Connected via standard OpenSSH from Windows PowerShell (`ssh -i
+  <path-to-pem> ubuntu@<IP>`) — decided against installing/using PuTTY,
+  since OpenSSH ships natively with Windows 10/11, uses the `.pem` file
+  directly with no `.ppk` conversion step, and supports the same
+  `~/.ssh/config` "saved session" equivalent PuTTY offers via its GUI.
+
+### WireGuard — Reconfigured as a 3-Peer Relay
+- Installed WireGuard on Eye_of_Terror (`sudo apt install wireguard`),
+  generated its own keypair, and configured `/etc/wireguard/wg0.conf`
+  as the relay hub:
+  - Interface address: `10.10.10.3/24`, listen port `51820`
+  - Peer entries for Rogal_Dorn (`10.10.10.1/32`) and VS (`10.10.10.2/32`)
+- Enabled IP forwarding at the OS level (`net.ipv4.ip_forward = 1`,
+  persisted in `/etc/sysctl.conf`) — required for Eye_of_Terror to
+  actually pass traffic between its two peers rather than just
+  terminating its own tunnel traffic.
+- **Reconfigured Rogal_Dorn's Webway peer entry** (previously pointed
+  directly at VS) to instead peer with Eye_of_Terror:
+  - Public Key: Eye_of_Terror's key
+  - Endpoint: `[REDACTED-PUBLIC-IP — see local notes]:51820`
+  - Allowed IPs: `10.10.10.0/24` (the full tunnel subnet, not a single
+    `/32` — necessary so Rogal_Dorn routes anything in that subnet,
+    including VS, through this one relay peer)
+  - Persistent Keepalive: 25
+- **Reconfigured VS's WireGuard client** similarly — peer changed to
+  Eye_of_Terror, Endpoint `[REDACTED-PUBLIC-IP — see local notes]:51820`, Allowed IPs
+  `10.10.10.0/24,192.168.1.0/24` (tunnel subnet plus PG-Guilliman, so VS
+  can reach both the relay and Guilliman through it).
+- **Removed the now-unnecessary Eero port-forward rule** (UDP 51820 →
+  Rogal_Dorn's WAN IP) — no longer needed once the connection model
+  flipped from inbound-to-home to outbound-from-home; confirmed this is
+  simply dead config with no functional purpose under the new
+  architecture, not something that needed to be replaced with a new
+  target.
+
+### Troubleshooting Sequence (in order encountered)
+1. **No handshake at all, either peer.** Root cause: AWS security group
+   was missing the UDP/51820 inbound rule entirely (only SSH had been
+   added at instance launch, despite earlier discussion) — confirmed by
+   checking the security group's actual rule list directly rather than
+   assuming. Fixed by adding the rule (and accidentally overwriting SSH
+   in the process, separately resolved above).
+2. **VS ↔ Eye_of_Terror handshake succeeded; VS ↔ Rogal_Dorn still
+   failed**, with Eye_of_Terror responding "Destination host
+   unreachable" for the Rogal_Dorn tunnel IP. Root cause: Rogal_Dorn's
+   peer entry was misconfigured with **its own public key** (ending
+   `[REDACTED — see local notes]`) instead of Eye_of_Terror's public key (ending
+   `[REDACTED — see local notes]`) — meaning pfSense had never actually been told to talk to
+   Eye_of_Terror at all. Also had an incorrect Allowed IPs value
+   (`10.10.10.2/32`, a leftover from the original VS-direct peer entry)
+   instead of the correct `10.10.10.0/24`. Both corrected; handshakes
+   then succeeded on both peers per `wg show` on Eye_of_Terror.
+3. **Handshakes up on both peers, but pings from VS to `10.10.10.1` and
+   `192.168.1.1` still timed out.** Root cause, identified in two parts:
+   - The WireGuard tunnel had never been assigned as a proper pfSense
+     interface (Interfaces → Assignments) — added as **OPT2**, renamed
+     **WireGuard_Webway**, and enabled.
+   - Even after assignment, traffic from OPT2 into LAN was still
+     blocked — confirmed via firewall logs that **no blocks were
+     logged on OPT2 itself** (ruling out the OPT2 pass rule as the
+     issue) while Guilliman → Rogal_Dorn (LAN → tunnel direction) ping
+     succeeded fine — isolating the problem specifically to the
+     OPT2-into-LAN direction. Default LAN rules (anti-lockout, allow
+     LAN-to-any) only cover traffic *sourced from* LAN, not traffic
+     *arriving from* another interface destined to LAN — a distinct,
+     separate rule was required.
+   - **Final root cause:** the OPT2/WireGuard_Webway interface itself
+     had no IPv4 address assigned at the interface-configuration level
+     (Interfaces → WireGuard_Webway) — the `10.10.10.1/24` address had
+     only been set within the WireGuard Tunnel's own Interface
+     Configuration page, which is a separate setting from the actual
+     OPT2 interface's IP assignment in pfSense. Without it, pfSense had
+     no properly configured return path for traffic arriving via that
+     interface. **Fix:** set IPv4 Configuration Type to Static, address
+     `10.10.10.1/24`, Upstream Gateway: None (not needed for a
+     point-to-point tunnel interface). This resolved the issue
+     completely.
+4. Along the way, also added a Pass rule on the OPT2 interface itself
+   (Firewall → Rules → OPT2) allowing traffic through — confirmed not
+   to have been the actual blocker once logs showed no OPT2-side blocks,
+   but left in place as it's still necessary for OPT2 to pass traffic at
+   all (a "default deny" interface with the correct IP but no rules
+   would have re-introduced the original problem).
+
+### Result — Confirmed Working
+- Full path verified: `ping 10.10.10.1` (Rogal_Dorn tunnel IP) and
+  `ping 192.168.1.1` (Rogal_Dorn LAN/PG-Guilliman) both succeed from VS,
+  routed through Eye_of_Terror.
+- This is the first working remote-access path into EoM from outside
+  the home network, resolving the CGNAT blocker identified earlier in
+  Session 11.
+
+### Open Items / Next Session
+- [ ] Expand VS's Allowed IPs to include `192.168.x.x` (PG-Valdor
+      subnet) once Valdor (Security Onion) is built, so remote access
+      covers that segment too
+- [ ] Consider adding a Pre-Shared Key to the WireGuard peers for
+      defense-in-depth (discussed, not configured this session)
+- [ ] Decide whether to keep or decommission Alpharius now that VS can
+      reach pfSense's GUI directly through the working tunnel
+- [ ] Delete duplicate pfSense ISO from datastore1 (carried over)
+- [ ] Reconcile Horus/Isstvan_III naming discrepancy (carried over)
+- [ ] Build Valdor (Security Onion) VM (carried over)
+- [ ] Install Wazuh software on the Guilliman VM (VM built and
+      networked; Wazuh itself not yet installed)
+- [ ] Re-point Isstvan_III's Wazuh agent to EoM's Guilliman once Wazuh
+      is running there
+- [ ] Decommission Lord_Commander_Guilliman on VS
+- [ ] Stand up AD DC, join Isstvan_III, run BloodHound (carried over)
+- [ ] (Deferred) Evaluate Netgate 1100 hardware (carried over) — note
+      this would not eliminate the CGNAT problem on its own; the
+      relay/Eye_of_Terror approach (or an ISP/IPv6 workaround, both
+      confirmed unavailable this session) would still be needed
+      regardless of which device terminates the tunnel at home
+- [ ] Add Eye_of_Terror's `.pem` key file to Keeper as an attachment
+      (currently stored locally under OneDrive sync only)
+- [ ] Reserve **Cadian_Gate** as a name for a possible future second
+      EC2 instance (defender-box concept, not yet scoped)
