@@ -1106,3 +1106,57 @@ BloodHound placement.
       hardware, placed between Eero and office switch
 - [ ] (Deferred, later phase) EC2 WireGuard relay for remote access when
       away from home with no port-forward path
+
+      Caught a typo in my own draft (line 122 garbled a sentence) — here's the corrected changelog, printed in full:
+
+---
+
+## [2026-06-27] Session 11 (continued) — WireGuard Configured, CGNAT Discovered as Blocker
+
+### Summary
+Continued directly from the DNS troubleshooting earlier in Session 11. Built a Kali Linux VM (named **Alpharius**) on EoM specifically to get browser-based GUI access to pfSense (no other device had both network reachability to PG-Guilliman and a working browser). Used the GUI to fix Rogal_Dorn's DNS Resolver. Installed and configured the WireGuard package on Rogal_Dorn (tunnel named **Webway**), set up VS as a peer, configured port forwarding on the Eero, and added a missing WAN firewall rule — but the tunnel still failed to complete a handshake. Root cause identified: Tim's ISP connection is behind **Carrier-Grade NAT (CGNAT)** — the "public" IP visible from whatsmyip.com is not actually a real public IP, making direct inbound WireGuard connectivity to the home network structurally impossible without ISP cooperation, a relay, or IPv6.
+
+### DNS Resolver Fix (Rogal_Dorn)
+- Confirmed via direct testing from Rogal_Dorn's own shell that Unbound's default mode (querying root DNS servers directly) was failing with a network error, while direct queries to known public resolvers (8.8.8.8) succeeded.
+- **Fix applied:** Services → DNS Resolver → enabled Forwarding Mode; System → General Setup → added DNS servers 8.8.8.8 and 1.1.1.1.
+- Confirmed working via Guilliman's `nslookup google.com`.
+- **Root cause not independently confirmed** — likely Eero intercepting root-server queries, but inferred, not verified.
+
+### Alpharius VM — Built (Kali Linux, EoM)
+- Built to solve a GUI-access gap (Guilliman had reachability, no browser; VS had a browser, no reachability).
+- Installed via Kali installer ISO. Specs: 2 vCPU/4GB RAM/40GB disk, 1 NIC on PG-Guilliman.
+- Named **Alpharius**. Tim noted **Omegon** as a good name for a possible future second box in this role.
+- Open question: keep long-term or decommission once WireGuard works — deferred.
+
+### WireGuard — Configured on Rogal_Dorn, Tunnel Fails to Establish
+- Tunnel named **Webway**, address `10.10.10.1/24`. Had to separately enable "Enable WireGuard" under the global Settings tab — distinct from enabling the tunnel itself; flagged as a UI quirk.
+- VS peer added: `10.10.10.2/32`, keepalive 25, public key manually retyped (no clipboard sharing between Alpharius's console and the physical Lenovo).
+- VS client configured: address `10.10.10.2/24`, endpoint = home public IP:51820, allowed IPs `192.168.1.0/24`.
+- Eero port forward: UDP 51820 → `192.168.4.248` — confirmed correctly targeted.
+- Added missing WAN firewall rule (only default RFC1918/bogon blocks existed) — Pass, UDP, any source, WAN address, port 51820.
+- **Result: still failed.** VS showed ~3 KiB sent, 0 received, no handshake.
+
+### Root Cause Identified: CGNAT
+- Ruled out first: WAN IP mismatch, double NAT, missing firewall rule (all checked/fixed, none resolved it).
+- Confirmed via modem's own DOCSIS admin page (`192.168.100.1`): WAN/gateway IP reported as `10.34.65.1` / `10.34.64.1` — both private RFC 1918 addresses, not the public IP shown by whatsmyip.com.
+- **Conclusion:** Tim's ISP connection sits behind Carrier-Grade NAT. No inbound connection of any kind can reach the home network directly, regardless of port-forwarding/firewall config — this is an ISP-level constraint, not a configuration bug.
+- A canyouseeme.org test (TCP/51820) was attempted but is not a valid test for UDP-based WireGuard; its inconclusive result is not cited as supporting evidence. The DOCSIS modem page is the actual confirming evidence.
+
+### Implications / Options Going Forward (undecided)
+- **EC2/VPS relay** — previously deferred as a nice-to-have; now likely necessary, since CGNAT only blocks inbound, not outbound, connections.
+- **ISP static/public IP add-on** — not yet checked if available.
+- **IPv6** — not yet checked if available/passed through; would avoid the relay dependency entirely if viable.
+- No option selected yet.
+
+### Open Items / Next Session
+- [ ] Decide CGNAT workaround: relay vs. ISP static IP vs. IPv6 (check IPv6 first)
+- [ ] If relay: stand up EC2/VPS, configure VS + Rogal_Dorn as outbound peers
+- [ ] Decide on keeping/decommissioning Alpharius
+- [ ] Delete duplicate pfSense ISO from datastore1
+- [ ] Reconcile Horus/Isstvan_III naming discrepancy
+- [ ] Build Valdor (Security Onion) VM
+- [ ] Install Wazuh on Guilliman (VM built, software not yet installed)
+- [ ] Re-point Isstvan_III's Wazuh agent once Wazuh is running on EoM
+- [ ] Decommission Lord_Commander_Guilliman on VS
+- [ ] Stand up AD DC, join Isstvan_III, run BloodHound
+- [ ] (Deferred) Evaluate Netgate 1100 hardware
