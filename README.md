@@ -5,7 +5,6 @@
 # 🔱 Empire_of_Man
 
 > *Detection Engineering & Cybersecurity Skills Lab*
-> *Originally conceived as STC-SOCaaS_v1, a SOC-as-a-Service prototype. Rescoped in 2026 to a focused, hands-on detection-engineering lab for skills development and portfolio/resume building.*
 
 ---
 
