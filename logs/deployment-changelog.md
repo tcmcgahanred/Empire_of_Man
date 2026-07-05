@@ -1450,3 +1450,82 @@ The original Rogal_Dorn failure (Sessions 11-12) was traced to:
 - [ ] Add topology PNG to diagrams/ folder in git repo
 - [ ] Add Eye_of_Terror .pem key to Keeper as attachment
 - [ ] (Deferred) Netgate 1100 hardware evaluation
+
+## [2026-07-05] Session 14 — Wazuh Installed, Full Pipeline Validated
+
+### Summary
+Installed Wazuh 4.14.5 on Lord_Commander_Guilliman (EoM). Re-pointed
+Isstvan_III's Wazuh agent from the old VS-side Guilliman IP
+(192.168.76.132) to the new EoM IP (192.168.1.100). Validated the full
+detection pipeline end to end, including confirmed remote connectivity
+via the WireGuard relay with no physical hardline.
+
+### Wazuh Install — Lord_Commander_Guilliman
+- Installed Wazuh 4.14.5 (current stable as of 2026-06-29) via the
+  official all-in-one installer:
+  ```bash
+  curl -O https://packages.wazuh.com/4.14/wazuh-install.sh
+  sudo bash ./wazuh-install.sh -a -i
+  ```
+- All three services confirmed running: wazuh-manager, wazuh-indexer,
+  wazuh-dashboard
+- Dashboard accessible at https://192.168.1.100
+- Admin password reset via CLI (GUI blocks admin password changes —
+  "admin is reserved"):
+  ```bash
+  sudo /usr/share/wazuh-indexer/plugins/opensearch-security/tools/wazuh-passwords-tool.sh -u admin -p <password>
+  ```
+- Credentials saved to Keeper
+
+### Isstvan_III Agent Re-pointed
+- Agent config had stale manager IP (192.168.76.132 — old VS Guilliman)
+- Updated via PowerShell:
+  ```powershell
+  (Get-Content "C:\Program Files (x86)\ossec-agent\ossec.conf") -replace '192.168.76.132', '192.168.1.100' | Set-Content "C:\Program Files (x86)\ossec-agent\ossec.conf"
+  Restart-Service WazuhSvc
+  ```
+- Agent registration confirmed in Guilliman's ossec.log:
+  `wazuh-authd: INFO: Agent key generated for 'Isstvan_III'`
+- Isstvan_III confirmed Active in agent list (ID: 001)
+
+### Sysmon localfile block re-added to ossec.conf
+- Added to C:\Program Files (x86)\ossec-agent\ossec.conf:
+  ```xml
+  <localfile>
+    <location>Microsoft-Windows-Sysmon/Operational</location>
+    <log_format>eventchannel</log_format>
+  </localfile>
+  ```
+- WazuhSvc restarted after change
+
+### Detection Validated
+- Test: `cmd.exe /c echo malware` from elevated PowerShell on Isstvan_III
+- Alert confirmed in dashboard: rule 92004, T1059.003 (Windows Command
+  Shell), Tactic: Execution
+- Dashboard path: Threat Hunting → Events
+- Query used: `agent.name: Isstvan_III AND data.win.system.eventID: 1`
+
+### Remote Connectivity Confirmed
+- Physical hardline disconnected from VS — WireGuard relay (Eye_of_Terror)
+  maintained connectivity
+- Ping to 192.168.1.100 (Guilliman) succeeded remotely
+- Full path confirmed: Isstvan_III → Webway → Eye_of_Terror →
+  Rogal_Dorn → Guilliman
+
+### Snapshots Taken (known good state)
+- Rogal_Dorn — pfSense configured, WireGuard working, DHCP serving
+- Lord_Commander_Guilliman — Wazuh 4.14.5 installed, Isstvan_III active
+- Isstvan_III — Wazuh agent pointing at 192.168.1.100, Sysmon
+  configured, ossec.conf updated
+
+### VS-side Guilliman Decommissioned
+- Lord_Commander_Guilliman VM on VS deleted from disk — no longer needed
+  now that EoM Guilliman is confirmed working
+
+### Open Items
+- [ ] VLAN trunking on vmx2 for PG-Alpharius (VLAN 40) — requires
+      dedicated session, no 4th NIC on Rogal_Dorn
+- [ ] Build Valdor (Security Onion) on PG-Valdor (VLAN 30)
+- [ ] Stand up AD DC, join Isstvan_III, run BloodHound
+- [ ] Migrate DHCP from isc-dhcpd to Kea (deferred)
+- [ ] Add topology PNG to diagrams/ in git repo
