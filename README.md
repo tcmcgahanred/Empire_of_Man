@@ -13,8 +13,6 @@
 
 Empire_of_Man is a homelab built to develop hands-on cybersecurity skills — detection engineering, network segmentation, purple-team exercises, and infrastructure administration — through direct practice rather than theory alone.
 
-The project originally set out to become a SOC-as-a-Service (SOCaaS) platform for underserved organizations (small businesses, nonprofits, schools, 501(c)(3)s). That ambition hasn't been abandoned, but it has been deliberately **descoped and deferred** in favor of a narrower, more achievable goal: build real detection-engineering reps, document the process thoroughly, and revisit the broader MSSP/SOCaaS vision later if it still aligns with longer-term goals.
-
 ---
 
 ## 🛡️ Inspiration & Thematic Alignment
@@ -27,8 +25,7 @@ This project draws inspiration from the lore and aesthetic of Warhammer 40,000, 
 
 ## 🧠 Philosophy
 
-> This platform is a **skills-development lab**, not a production service.
-> Its current mission is to build real, demonstrable detection-engineering and infrastructure capability — one validated technique, one fixed misconfiguration, one documented root cause at a time.
+> This platform is built to develop real, demonstrable detection-engineering and infrastructure capability — one validated technique, one fixed misconfiguration, one documented root cause at a time.
 
 *"In vigilance, we serve. In segmentation, we shield. In automation, we strike."*
 *— STC-SOCaaS_v1 Primer, Machine-Verified*
@@ -78,7 +75,7 @@ Both EoM (`Rogal_Dorn`) and VS dial **outbound** to this relay rather than accep
 - Security Onion (`Valdor`) for network security monitoring (Suricata + Zeek)
 - Active Directory domain controller + BloodHound for attack-path analysis
 - Original Suricata detection rules validated against real, disclosed CVEs
-- TheHive/Cortex for SOAR-style case management (longer-term, if MSSP scope is revisited)
+- TheHive/Cortex for SOAR-style case management (longer-term)
 
 ---
 
@@ -115,8 +112,4 @@ Both EoM (`Rogal_Dorn`) and VS dial **outbound** to this relay rather than accep
 - [ ] Stand up Security Onion (Valdor) for network security monitoring
 - [ ] Stand up an Active Directory environment and run BloodHound for attack-path analysis
 - [ ] Write and validate an original Suricata rule against a real, disclosed CVE
-- [ ] Re-evaluate the broader SOCaaS/MSSP vision once core skills-development goals are met
-
----
-
-*Note: this project's history includes an earlier build era using ChatGPT before migrating to Claude. The master changelog in `logs/` preserves that full history, credentials scrubbed, for continuity.*
+*Note: the master changelog in `logs/` preserves the full build history, credentials scrubbed, for continuity.*
