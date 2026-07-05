@@ -1345,3 +1345,108 @@ network.
       (currently stored locally under OneDrive sync only)
 - [ ] Reserve **Cadian_Gate** as a name for a possible future second
       EC2 instance (defender-box concept, not yet scoped)
+
+      ## [2026-06-29] Session 13 — Rogal_Dorn Rebuild, WireGuard Restored
+
+### Summary
+Rogal_Dorn was deleted and rebuilt from scratch using the Netgate
+Installer v1.2 (pfSense CE 2.8.1). After a lengthy troubleshooting
+process involving DHCP configuration, WireGuard package quirks, and
+stale public keys on Eye_of_Terror, full end-to-end connectivity was
+restored: VS → Eye_of_Terror → Rogal_Dorn → PG-Guilliman.
+
+### Root Cause of Previous Session's Rogal_Dorn Failure
+The original Rogal_Dorn failure (Sessions 11-12) was traced to:
+1. **ESXi 4-NIC probe-order instability** — adding a 4th virtual NIC
+   to Rogal_Dorn triggered a documented VMware behavior where NIC
+   enumeration order becomes unstable past 3 NICs, disrupting existing
+   interface assignments silently. Confirmed via forum documentation.
+2. **isc-dhcpd failing to start** — a secondary issue that persisted
+   through the instability; never fully resolved before the decision to
+   rebuild.
+3. **Decision:** rebuild Rogal_Dorn fresh rather than continue debugging
+   a compromised state. **Lesson learned:** take a VM snapshot before
+   any risky NIC/interface change.
+
+### Netgate Installer vs. Legacy pfSense CE ISO
+- The Netgate Installer v1.2 is Netgate's current unified installer,
+  replacing the standalone pfSense CE ISO. It fetches packages over
+  the internet and prompts for CE vs. Plus selection (CE is free, Plus
+  requires a paid license).
+- During install, the LAN interface configuration wizard pre-configures
+  DHCP server settings (static IP, range) — a significant improvement
+  over the old installer, which left this entirely to the GUI post-install.
+- **Key issue:** the installer retained old `dhcpd.conf` from the
+  previous datastore (stale `10.x.x.x` subnet declarations) despite
+  being a fresh VM. Required manual editing of
+  `/usr/local/etc/dhcpd.conf` to add the correct `192.168.1.0/24`
+  subnet declaration.
+- isc-dhcpd also required a manual `touch /var/db/dhcpd.leases` before
+  it would start (lease database file missing on fresh install).
+- **Note:** isc-dhcpd is EOL and will be removed in a future pfSense
+  version. Kea is the recommended replacement (System → Advanced →
+  Networking). Not yet migrated — deferred.
+
+### pfSense 2.8.1 + WireGuard 0.2.9_6 Known Bug
+- A confirmed Netgate forum bug report (April 2026) documents that
+  pfSense 2.8.1 + WireGuard package 0.2.9_6 has an issue where
+  encrypted WireGuard handshake packets reach pfSense and decrypt
+  successfully, but decrypted client data packets never surface on the
+  assigned tun_wg interface for routing. Same config worked on 2.7.2.
+- This was investigated during troubleshooting but ultimately was NOT
+  the root cause of Tim's connectivity failure — the actual cause was
+  Eye_of_Terror still having Rogal_Dorn's old public key from the
+  previous build (ending `2g=` instead of the new `zE=`). Once
+  Eye_of_Terror's wg0.conf was updated and restarted, full connectivity
+  was restored on 2.8.1 without downgrading.
+- The known bug may still be relevant in other scenarios — flagged for
+  awareness.
+
+### WireGuard Interface Assignment — pfSense 2.8.1 Quirk
+- `tun_wg0` does not automatically appear in Interfaces → Assignments
+  dropdown. It is hidden in the "Available network ports" dropdown which
+  defaults to showing `vmx2` — `tun_wg0` must be manually selected from
+  that same dropdown before clicking Add. Not a bug, just a non-obvious
+  UI behavior.
+- Correct sequence confirmed for pfSense 2.8.1:
+  1. VPN → WireGuard → Settings → Enable WireGuard → Save → Apply Changes
+  2. Create tunnel
+  3. Interfaces → Assignments → select `tun_wg0` from dropdown → Add
+  4. Enable interface, set static IPv4 `10.10.10.1/24`
+  5. Add firewall rule on the new interface (Pass, any/any)
+
+### Other Issues Encountered This Session
+- **"Keep Configuration" during WireGuard uninstall** caused stale
+  config to persist across reinstalls — always uncheck this before
+  removing the package.
+- **IPv6/DHCPv6 conflict** — pfSense pre-enabled DHCPv6 and Router
+  Advertisements on LAN, which blocked setting a static IPv4 on the
+  interface. Fixed by disabling IPv6 entirely: System → Advanced →
+  Networking → Disable IPv6.
+- **PIA VPN on VS** — confirmed not a cause of WireGuard failures but
+  worth disabling before testing tunnel connectivity, since an active
+  commercial VPN client can interfere with custom WireGuard configs.
+
+### Current Public Keys (as of this rebuild)
+- **Eye_of_Terror**: `YQ0KMayBp9vc4dWoN/t2vp/Whl0iMIbMllWCa7vK4DI=`
+- **VS**: `1LPIc3oLVj++TQdQoMYXN7uPwGBmt+vtHtaxPYkVnTY=`
+- **Rogal_Dorn (new)**: `9wIVq1f2nQHTMyxBUjuyVOHb+uhBW4omit4OHBOkhzE=`
+
+### Connectivity Confirmed
+- VS → Eye_of_Terror → Rogal_Dorn (`ping 10.10.10.1`) ✓
+- VS → Eye_of_Terror → Rogal_Dorn → PG-Guilliman (`ping 192.168.1.1`) ✓
+
+### Open Items / Next Session
+- [ ] Install Wazuh on Lord_Commander_Guilliman (VM exists, software not
+      yet installed)
+- [ ] Re-point Isstvan_III's Wazuh agent to Guilliman's EoM IP
+      (192.168.1.100) once Wazuh is running
+- [ ] Decommission Lord_Commander_Guilliman on VS
+- [ ] Migrate/configure DHCP from isc-dhcpd to Kea (deferred)
+- [ ] Build Valdor (Security Onion) on PG-Valdor (VLAN 30)
+- [ ] Build Alpharius (Kali) on PG-Alpharius (VLAN 40) — requires
+      trunking on existing interface, NOT a 4th NIC on Rogal_Dorn
+- [ ] Stand up AD DC, join Isstvan_III, run BloodHound
+- [ ] Add topology PNG to diagrams/ folder in git repo
+- [ ] Add Eye_of_Terror .pem key to Keeper as attachment
+- [ ] (Deferred) Netgate 1100 hardware evaluation
