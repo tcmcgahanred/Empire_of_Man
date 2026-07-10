@@ -1529,3 +1529,88 @@ via the WireGuard relay with no physical hardline.
 - [ ] Stand up AD DC, join Isstvan_III, run BloodHound
 - [ ] Migrate DHCP from isc-dhcpd to Kea (deferred)
 - [ ] Add topology PNG to diagrams/ in git repo
+
+## [2026-07-05] Session 15 — Network Restructure, Security Onion Install in Progress
+
+### Summary
+Renamed port groups to match lore conventions, restructured network
+addressing to use static IPs throughout, diagnosed and fixed multiple
+Layer 2 connectivity issues, and successfully started Security Onion
+3.1.0 installation on Valdor. Install was still in progress (downloading
+/upgrading packages) at session end.
+
+### Port Group Renames
+- `PG-Guilliman` → `PG-Ultramarines` (VLAN 20, 192.168.1.0/24)
+- `PG-Valdor` → `PG-Custodes` (VLAN 30, 192.168.2.0/24)
+- Naming convention established: port groups named after legions,
+  VMs named after primarchs/characters
+
+### New VMs Planned
+- **Calth** — victim VM on PG-Ultramarines
+- **Hive_Primus** — victim VM on PG-Custodes
+- **Valdor** — Security Onion (Constantin_Valdor), on PG-Custodes (management)
+  and PG-Ultramarines (sniffing NIC)
+
+### Rogal_Dorn — OPT2 (Custodes) Configured
+- vmx2 assigned as OPT2 → interface renamed `Custodes` in pfSense
+- Static IP: `192.168.2.1/24`
+- DHCP server enabled on Custodes: range `192.168.2.100`-`192.168.2.200`
+- Firewall rule added: Pass IPv4 Any/Any on Custodes interface
+- **Key issue discovered:** vmx2's "Connected" checkbox in ESXi was
+  unchecked, causing "no carrier" on the Custodes interface. This
+  silently broke all Layer 2 connectivity on PG-Custodes. Fixed by
+  re-checking "Connected" in Rogal_Dorn's VM settings.
+
+### Static IP Migration (away from DHCP on LAN)
+- DHCP disabled on LAN (PG-Ultramarines) — all VMs now use static IPs
+- **Lord_Commander_Guilliman:** static `192.168.1.100/24` via netplan
+- **Alpharius:** two NICs
+  - eth0 → PG-Ultramarines: `192.168.1.101/24`, gateway `192.168.1.1`
+  - eth1 → PG-Custodes: `192.168.2.101/24`, no gateway (Ultramarines
+    owns the default route)
+  - Configured via nm-connection-editor (Kali uses NetworkManager, not
+    netplan)
+  - Key lesson: both NICs having a gateway creates competing default
+    routes — only the primary segment's NIC should have a gateway set
+
+### Alpharius — Second NIC Added
+- Added second NIC to Alpharius connected to PG-Custodes (eth1,
+  192.168.2.101/24) giving it visibility into both segments
+
+### Constantin_Valdor (Security Onion VM) — Setup
+- VM specs: 4 vCPU, 24GB RAM, 200GB disk
+- Two NICs:
+  - NIC 1 → PG-Custodes (management, ens34) — `192.168.2.10/24`
+  - NIC 2 → PG-Ultramarines (sniffing, ens37) — no IP
+- Hostname: `valdor`
+- **SO installer error resolved:** "The IP being routed by Linux is not
+  the IP address assigned to the management interface" — caused by ens37
+  (sniffing NIC) acquiring a DHCP lease on PG-Ultramarines and creating
+  a conflicting default route. Fixed by disabling DHCP on LAN entirely,
+  so ens37 gets no IP.
+- **Install command:** `sudo /home/valdor/SecurityOnion/setup/so-setup iso`
+- **Access range entered:** `192.168.0.0/16`
+- Status at session end: downloading/upgrading packages — install in
+  progress
+
+### Key Lessons Learned
+- ESXi "Connected" checkbox on a VM NIC can be silently unchecked,
+  causing "no carrier" on a pfSense interface with no obvious error
+  in the pfSense GUI — always verify in Host Client if an interface
+  shows no carrier despite appearing configured
+- Security Onion requires the sniffing NIC to have NO IP address —
+  if it gets a DHCP lease, a conflicting default route is created
+  and the installer fails with a routing error
+- Kali Linux uses NetworkManager (nmcli/nm-connection-editor), not
+  netplan — Ubuntu uses netplan
+- When a VM has two NICs on different subnets, only one should have
+  a default gateway set to avoid routing conflicts
+
+### Open Items
+- [ ] Complete Security Onion install on Valdor (in progress)
+- [ ] Verify SO dashboard accessible at https://192.168.2.10
+- [ ] Build Calth (victim VM, PG-Ultramarines)
+- [ ] Build Hive_Primus (victim VM, PG-Custodes)
+- [ ] VLAN trunking for additional segments (deferred)
+- [ ] AD DC + BloodHound (deferred)
+- [ ] Update topology PNG in diagrams/
