@@ -1614,3 +1614,100 @@ Layer 2 connectivity issues, and successfully started Security Onion
 - [ ] VLAN trunking for additional segments (deferred)
 - [ ] AD DC + BloodHound (deferred)
 - [ ] Update topology PNG in diagrams/
+
+## [2026-07-12] Session 16 — iPhone WireGuard, SO Access, Victim VM Planning
+
+### Summary
+Added iPhone as a WireGuard peer, resolved Security Onion dashboard
+access (403 errors), covered VM file management fundamentals, and
+planned victim VM architecture for PG-Custodes and PG-Ultramarines.
+
+### iPhone WireGuard Peer Added
+- iOS WireGuard app configured as a new Webway peer
+- Tunnel IP: 10.10.10.4/24
+- Public key: Tcy0Db4iUpHWtcGY90bY+hKYiBDGI+seVVNkGFyArB8=
+- Added as permanent peer on Eye_of_Terror via:
+  ```bash
+  sudo wg set wg0 peer Tcy0Db4iUpHWtcGY90bY+hKYiBDGI+seVVNkGFyArB8= allowed-ips 10.10.10.4/32
+  ```
+- Good handshake confirmed
+- SO dashboard accessible from iPhone after so-firewall update
+
+### PG-Custodes Added to VS and iPhone AllowedIPs
+- Updated VS WireGuard client peer AllowedIPs:
+  ```
+  10.10.10.0/24, 192.168.1.0/24, 192.168.2.0/24
+  ```
+- Updated Eye_of_Terror wg0.conf Rogal_Dorn peer AllowedIPs:
+  ```
+  10.10.10.1/32, 192.168.1.0/24, 192.168.2.0/24
+  ```
+- VS confirmed pinging 192.168.2.1 and 192.168.2.10
+
+### Security Onion Dashboard Access Resolved
+- Initial install set access to only `192.168.2.10` (Valdor's own IP)
+- VS (10.10.10.2), Alpharius (192.168.1.101, 192.168.2.101), and iPhone
+  (10.10.10.4) all added via:
+  ```bash
+  sudo so-firewall includehost analyst <IP>
+  sudo so-firewall apply
+  ```
+- Dashboard confirmed accessible from VS, Alpharius, and iPhone at
+  https://192.168.2.10
+
+### VM File Management — Key Lessons
+- VM files (config .vmx, virtual disk .vmdk, snapshots, logs) are stored
+  in a folder per VM at a chosen location
+- On VMware Workstation (VS): default path is chosen during wizard,
+  typically Documents\Virtual Machines\<VM name>
+- On ESXi (EoM): all VMs stored in datastore1 on the R640's RAID 10
+  array, managed by ESXi Host Client
+- Moving a VM safely: either use VMware Workstation's built-in Move
+  function, or move the folder manually then File → Open the .vmx at
+  its new location
+- Never move individual files within a VM folder separately from the .vmx
+- Never store VM files in OneDrive-synced folders (known issue from 2025)
+- Horus successfully relocated from Machine_Spirits\ to
+  Machine_Spirits\Horus\ using the manual move + re-open approach
+
+### Victim VM Architecture Planned
+Naming convention confirmed: port groups named after legions, VMs after
+characters/locations. Snapshots to be taken enterprise-wide before any
+attack exercises begin.
+
+**PG-Ultramarines (192.168.1.0/24):**
+- Calth — Linux victim VM (Metasploitable 3 Ubuntu 14.04), planned
+
+**PG-Custodes (192.168.2.0/24):**
+- Hive_Primus — Windows victim VM (Metasploitable 3 Win2008 R2), planned
+- TBD name — Linux victim VM (Metasploitable 3 Ubuntu 14.04), planned
+
+**Attack flow envisioned:**
+- Horus attacks victims across both segments via Webway
+- Lateral movement between segments (Custodes → Ultramarines) is
+  deliberately possible for realistic kill chain exercises
+- Valdor (Security Onion) monitors network traffic on PG-Ultramarines
+  (sniffing NIC, ens37, no IP)
+- Guilliman (Wazuh) catches host-based telemetry from agents
+- Snapshots on all VMs = reset button after each exercise
+
+### Metasploitable 3 Research
+- Windows Server 2008 R2 version: no pre-built OVA exists due to
+  Microsoft licensing restrictions — must be built via Vagrant + Packer
+  (downloads Windows evaluation copy from Microsoft during build)
+- Ubuntu 14.04 version: pre-built OVA available on SourceForge
+- Vagrant current support status: to be confirmed next session
+- Decision deferred: evaluating Vagrant + VirtualBox build vs.
+  custom Windows Server victim vs. OVA-based Linux victim
+
+### Open Items
+- [ ] Confirm Vagrant support/EOL status before committing to that path
+- [ ] Build Hive_Primus (Windows victim, PG-Custodes)
+- [ ] Build Linux victim on PG-Custodes (name TBD)
+- [ ] Build Calth (Linux victim, PG-Ultramarines) — deferred
+- [ ] Add iPhone peer permanently to Eye_of_Terror wg0.conf
+- [ ] Update SENSITIVE_LOCAL_ONLY.txt with iPhone public key
+- [ ] Enterprise-wide snapshots before attack exercises
+- [ ] Update topology PNG in diagrams/
+- [ ] Full README update (deferred)
+- [ ] Terraform setup for multi-VM provisioning (future session)
