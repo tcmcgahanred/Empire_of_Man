@@ -1,5 +1,3 @@
-<img width="962" height="832" alt="topology_v20260720" src="https://github.com/user-attachments/assets/73d69eb7-0385-4c36-95e7-3f2cd6bd899f" />
-<img width="962" height="832" alt="topology_v20260720" src="https://github.com/user-attachments/assets/4777c990-f5df-4d0a-8611-ec4b4205b3e0" />
 **Security Notice:**
 
 > This documentation references internal-only, non-routable IP addresses and placeholder configurations. No credentials, license keys, or other directly-usable secrets are included in this repository. Where a real public IP or comparable identifier is operationally relevant, it has been redacted or generalized.
