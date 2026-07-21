@@ -41,7 +41,7 @@ The lab is split across two physical hosts by role, plus a small cloud relay tha
 |---------------|-------------------------------------|
 | Chassis       | Dell PowerEdge R640                 |
 | Hypervisor    | VMware ESXi 8.0U3e (free, no expiration) |
-| Role          | Defensive infrastructure: firewall, SIEM, future NSM |
+| Role          | Defensive infrastructure: firewall, SIEM, network security monitoring |
 
 ### VS — "Vengeful Spirit" (mobile, disposable)
 
@@ -61,17 +61,25 @@ Both EoM (`Rogal_Dorn`) and VS dial **outbound** to this relay rather than accep
 
 ---
 
+## 🗺️ Topology
+
+![Empire of Man network topology](diagrams/topology.png)
+
+*Maintained in [draw.io](https://app.diagrams.net/); source file at [`diagrams/empire_of_man_topology.drawio`](diagrams/empire_of_man_topology.drawio).*
+
+---
+
 ## 🛠️ Core Capabilities (Current)
 
 - pfSense firewall/router (`Rogal_Dorn`) with VLAN-segmented internal networks
-- WireGuard-based remote access, relayed through a small EC2 instance to work around CGNAT
+- WireGuard-based remote access, relayed through a small EC2 instance to work around CGNAT, with host-level logging (SSH auth, system events) on the relay itself
 - Wazuh SIEM (`Lord_Commander_Guilliman`) with Sysmon-based Windows endpoint telemetry
+- Security Onion (`Valdor`) for network security monitoring (Suricata + Zeek)
 - Kali Linux attacker tooling on both hosts (`Horus` on VS, `Alpharius` on EoM)
 - Detection validation against MITRE ATT&CK-mapped techniques using Atomic Red Team
 
 ## 🛠️ Capabilities (Planned)
 
-- Security Onion (`Valdor`) for network security monitoring (Suricata + Zeek)
 - Active Directory domain controller + BloodHound for attack-path analysis
 - Original Suricata detection rules validated against real, disclosed CVEs
 - TheHive/Cortex for SOAR-style case management (longer-term)
@@ -80,11 +88,11 @@ Both EoM (`Rogal_Dorn`) and VS dial **outbound** to this relay rather than accep
 
 ## 📦 Current Scope
 
-- Dell R640 running ESXi 8.0U3e, segmented via `vSwitch-palace`
+- Dell R640 running ESXi 8.0U3e, segmented via `vSwitch-palace` into two VLANs (`PG-Ultramarines`, `PG-Custodes`)
 - pfSense firewall VM (`Rogal_Dorn`) providing routing, DHCP, segmentation, and WireGuard
-- VLAN-segmented port groups for SIEM and future NSM/attacker tooling
 - Wazuh SIEM (`Lord_Commander_Guilliman`) ingesting Sysmon telemetry from a Windows target
-- WireGuard remote access via a self-hosted EC2 relay (`Eye_of_Terror`), CGNAT-safe by design
+- Security Onion (`Valdor`) providing network security monitoring on `PG-Custodes`
+- WireGuard remote access via a self-hosted EC2 relay (`Eye_of_Terror`), CGNAT-safe by design and logged into the SIEM
 - Lab credentials managed exclusively in a password manager — never committed to this repository
 
 ---
@@ -108,7 +116,7 @@ Both EoM (`Rogal_Dorn`) and VS dial **outbound** to this relay rather than accep
 - [x] Deploy pfSense and configure WAN/LAN/OPT interfaces
 - [x] Stand up Wazuh SIEM with validated Sysmon-based detection
 - [x] Solve remote access under CGNAT via a self-hosted WireGuard relay
-- [ ] Stand up Security Onion (Valdor) for network security monitoring
+- [x] Stand up Security Onion (Valdor) for network security monitoring
 - [ ] Stand up an Active Directory environment and run BloodHound for attack-path analysis
 - [ ] Write and validate an original Suricata rule against a real, disclosed CVE
 *Note: the master changelog in `logs/` preserves the full build history, credentials scrubbed, for continuity.*
