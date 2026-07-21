@@ -1,77 +1,96 @@
 <mxfile host="app.diagrams.net">
-  <diagram name="Empire of Man Topology" id="eom-topology-1">
-    <mxGraphModel dx="1400" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1100" pageHeight="1400" math="0" shadow="0">
+  <diagram name="Empire of Man Topology" id="eom-topology-2">
+    <mxGraphModel dx="1600" dy="1000" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1200" pageHeight="1700" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
 
         <!-- VS container -->
         <mxCell id="vs_container" value="VS - Vengeful Spirit (laptop)" style="rounded=1;arcSize=8;fillColor=#FAECE7;strokeColor=#D85A30;verticalAlign=top;fontStyle=1;fontSize=13;" vertex="1" parent="1">
-          <mxGeometry x="280" y="40" width="480" height="160" as="geometry" />
+          <mxGeometry x="300" y="40" width="480" height="180" as="geometry" />
         </mxCell>
-        <mxCell id="vs_horus" value="Horus / Alpharius&#10;Kali - attacker" style="rounded=1;arcSize=10;fillColor=#F1EFE8;strokeColor=#888780;" vertex="1" parent="1">
-          <mxGeometry x="300" y="80" width="150" height="50" as="geometry" />
+        <mxCell id="vs_horus" value="Horus / Alpharius&#10;(attacker box, Kali)" style="rounded=1;arcSize=10;fillColor=#F1EFE8;strokeColor=#888780;" vertex="1" parent="1">
+          <mxGeometry x="320" y="80" width="150" height="50" as="geometry" />
         </mxCell>
-        <mxCell id="vs_isstvan" value="Isstvan_III&#10;Win10 + Wazuh agent" style="rounded=1;arcSize=10;fillColor=#F1EFE8;strokeColor=#888780;" vertex="1" parent="1">
-          <mxGeometry x="470" y="80" width="150" height="50" as="geometry" />
+        <mxCell id="vs_isstvan" value="Isstvan_III&#10;Windows 10 + Wazuh agent" style="rounded=1;arcSize=10;fillColor=#F1EFE8;strokeColor=#888780;" vertex="1" parent="1">
+          <mxGeometry x="490" y="80" width="150" height="50" as="geometry" />
         </mxCell>
-        <mxCell id="vs_wg" value="WireGuard &quot;Webway&quot; client&#10;10.10.10.2" style="rounded=1;arcSize=10;fillColor=#EEEDFE;strokeColor=#534AB7;" vertex="1" parent="1">
-          <mxGeometry x="300" y="150" width="320" height="40" as="geometry" />
+        <mxCell id="vs_wg" value="WireGuard &quot;Webway&quot; client&#10;10.10.10.2/24" style="rounded=1;arcSize=10;fillColor=#EEEDFE;strokeColor=#534AB7;" vertex="1" parent="1">
+          <mxGeometry x="320" y="150" width="320" height="50" as="geometry" />
         </mxCell>
 
         <!-- Eye of Terror relay -->
-        <mxCell id="eot" value="Eye_of_Terror&#10;EC2 WireGuard relay" style="rounded=1;arcSize=10;fillColor=#FAECE7;strokeColor=#D85A30;" vertex="1" parent="1">
-          <mxGeometry x="620" y="260" width="180" height="50" as="geometry" />
+        <mxCell id="eot" value="Eye_of_Terror&#10;OS: Ubuntu&#10;NIC: wg0 - 10.10.10.3/24&#10;Elastic IP 18.227.25.244:51820" style="rounded=1;arcSize=10;fillColor=#FAECE7;strokeColor=#D85A30;align=left;spacingLeft=8;" vertex="1" parent="1">
+          <mxGeometry x="720" y="260" width="260" height="80" as="geometry" />
+        </mxCell>
+
+        <!-- WireGuard peer table -->
+        <mxCell id="peer_table" value="WireGuard peers (Webway)&#10;10.10.10.1 = Rogal_Dorn&#10;10.10.10.2 = VS&#10;10.10.10.3 = Eye_of_Terror&#10;10.10.10.4 = iPhone" style="rounded=1;arcSize=8;fillColor=#EEEDFE;strokeColor=#534AB7;align=left;spacingLeft=8;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="1020" y="40" width="220" height="110" as="geometry" />
         </mxCell>
 
         <!-- Rogal_Dorn -->
-        <mxCell id="rogal" value="Rogal_Dorn&#10;pfSense - WAN/LAN/OPT1" style="rounded=1;arcSize=10;fillColor=#E1F5EE;strokeColor=#0F6E56;" vertex="1" parent="1">
-          <mxGeometry x="420" y="340" width="200" height="50" as="geometry" />
+        <mxCell id="rogal" value="Rogal_Dorn (pfSense)&#10;vmx0 - WAN - Eero, 192.168.4.248&#10;vmx1 - LAN - PG-Ultramarines VLAN20, 192.168.1.1/24&#10;vmx2 - OPT2 - PG-Custodes VLAN30, 192.168.2.1/24&#10;tun_wg0 - WireGuard_Webway, 10.10.10.1/24" style="rounded=1;arcSize=10;fillColor=#E1F5EE;strokeColor=#0F6E56;align=left;spacingLeft=8;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="400" y="360" width="380" height="120" as="geometry" />
         </mxCell>
 
         <!-- pfSense GUI offshoot -->
         <mxCell id="pfsense_gui" value="pfSense web GUI" style="rounded=1;arcSize=10;fillColor=#EEEDFE;strokeColor=#534AB7;" vertex="1" parent="1">
-          <mxGeometry x="700" y="345" width="160" height="40" as="geometry" />
+          <mxGeometry x="820" y="400" width="160" height="40" as="geometry" />
         </mxCell>
         <mxCell id="e_pf_gui" style="endArrow=block;html=1;strokeColor=#534AB7;" edge="1" parent="1" source="rogal" target="pfsense_gui">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
 
-        <!-- PG-Ultramarines segment -->
-        <mxCell id="pg_ultra" value="PG-Ultramarines&#10;192.168.1.0/24" style="rounded=1;arcSize=8;fillColor=#E6F1FB;strokeColor=#185FA5;verticalAlign=top;fontStyle=1;fontSize=13;" vertex="1" parent="1">
-          <mxGeometry x="100" y="440" width="420" height="200" as="geometry" />
+        <!-- vSwitch-palace -->
+        <mxCell id="vswitch" value="vSwitch-palace&#10;(ESXi virtual switch)" style="rounded=1;arcSize=10;fillColor=#F1EFE8;strokeColor=#5F5E5A;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="500" y="470" width="220" height="50" as="geometry" />
         </mxCell>
-        <mxCell id="guilliman" value="Guilliman&#10;Wazuh manager - .100" style="rounded=1;arcSize=10;fillColor=#E1F5EE;strokeColor=#0F6E56;" vertex="1" parent="1">
-          <mxGeometry x="120" y="480" width="170" height="55" as="geometry" />
+        <mxCell id="e_rogal_vswitch" style="endArrow=block;html=1;strokeColor=#5F5E5A;" edge="1" parent="1" source="rogal" target="vswitch">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_vswitch_ultra" value="PG-Ultramarines" style="endArrow=block;html=1;strokeColor=#5F5E5A;fontSize=11;" edge="1" parent="1" source="vswitch" target="pg_ultra">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_vswitch_custodes" value="PG-Custodes" style="endArrow=block;html=1;strokeColor=#5F5E5A;fontSize=11;" edge="1" parent="1" source="vswitch" target="pg_custodes">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- PG-Ultramarines segment -->
+        <mxCell id="pg_ultra" value="PG-Ultramarines - VLAN 20&#10;192.168.1.0/24" style="rounded=1;arcSize=8;fillColor=#E6F1FB;strokeColor=#185FA5;verticalAlign=top;fontStyle=1;fontSize=13;" vertex="1" parent="1">
+          <mxGeometry x="100" y="520" width="480" height="280" as="geometry" />
+        </mxCell>
+        <mxCell id="guilliman" value="Lord_Commander_Guilliman&#10;OS: Ubuntu (Wazuh manager)&#10;ens34 - 192.168.1.100/24" style="rounded=1;arcSize=10;fillColor=#E1F5EE;strokeColor=#0F6E56;align=left;spacingLeft=8;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="120" y="565" width="220" height="70" as="geometry" />
         </mxCell>
         <mxCell id="wazuh_gui" value="Wazuh dashboard" style="rounded=1;arcSize=10;fillColor=#EEEDFE;strokeColor=#534AB7;" vertex="1" parent="1">
-          <mxGeometry x="120" y="555" width="170" height="40" as="geometry" />
+          <mxGeometry x="120" y="645" width="220" height="40" as="geometry" />
         </mxCell>
         <mxCell id="e_wazuh_gui" style="endArrow=block;html=1;strokeColor=#534AB7;" edge="1" parent="1" source="guilliman" target="wazuh_gui">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="alpharius" value="Alpharius&#10;dual-NIC bridge - .101" style="rounded=1;arcSize=10;fillColor=#E1F5EE;strokeColor=#0F6E56;" vertex="1" parent="1">
-          <mxGeometry x="320" y="480" width="170" height="55" as="geometry" />
+        <mxCell id="alpharius" value="Alpharius&#10;OS: Kali Linux&#10;eth0 - PG-Ultramarines, 192.168.1.101/24 (gw)&#10;eth1 - PG-Custodes, 192.168.2.101/24 (no gw)" style="rounded=1;arcSize=10;fillColor=#E1F5EE;strokeColor=#0F6E56;align=left;spacingLeft=8;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="360" y="565" width="200" height="90" as="geometry" />
         </mxCell>
         <mxCell id="calth" value="Calth&#10;planned victim - Linux" style="rounded=1;arcSize=10;dashed=1;fillColor=#F1EFE8;strokeColor=#888780;" vertex="1" parent="1">
-          <mxGeometry x="320" y="555" width="170" height="55" as="geometry" />
+          <mxGeometry x="120" y="700" width="220" height="55" as="geometry" />
         </mxCell>
 
         <!-- PG-Custodes segment -->
-        <mxCell id="pg_custodes" value="PG-Custodes&#10;192.168.2.0/24" style="rounded=1;arcSize=8;fillColor=#FAECE7;strokeColor=#993C1D;verticalAlign=top;fontStyle=1;fontSize=13;" vertex="1" parent="1">
-          <mxGeometry x="560" y="440" width="420" height="200" as="geometry" />
+        <mxCell id="pg_custodes" value="PG-Custodes - VLAN 30&#10;192.168.2.0/24" style="rounded=1;arcSize=8;fillColor=#FAECE7;strokeColor=#993C1D;verticalAlign=top;fontStyle=1;fontSize=13;" vertex="1" parent="1">
+          <mxGeometry x="640" y="520" width="480" height="280" as="geometry" />
         </mxCell>
-        <mxCell id="valdor" value="Valdor&#10;Security Onion - .10" style="rounded=1;arcSize=10;fillColor=#E1F5EE;strokeColor=#0F6E56;" vertex="1" parent="1">
-          <mxGeometry x="580" y="480" width="170" height="55" as="geometry" />
+        <mxCell id="valdor" value="Constantin_Valdor&#10;OS: Security Onion (standalone)&#10;ens34 - management, 192.168.2.10/24&#10;ens37 - sniffing, PG-Ultramarines, no IP" style="rounded=1;arcSize=10;fillColor=#E1F5EE;strokeColor=#0F6E56;align=left;spacingLeft=8;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="660" y="565" width="240" height="90" as="geometry" />
         </mxCell>
         <mxCell id="so_gui" value="SO dashboard" style="rounded=1;arcSize=10;fillColor=#EEEDFE;strokeColor=#534AB7;" vertex="1" parent="1">
-          <mxGeometry x="580" y="555" width="170" height="40" as="geometry" />
+          <mxGeometry x="660" y="665" width="240" height="40" as="geometry" />
         </mxCell>
         <mxCell id="e_so_gui" style="endArrow=block;html=1;strokeColor=#534AB7;" edge="1" parent="1" source="valdor" target="so_gui">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="hive" value="Hive_Primus&#10;planned victim - Windows" style="rounded=1;arcSize=10;dashed=1;fillColor=#F1EFE8;strokeColor=#888780;" vertex="1" parent="1">
-          <mxGeometry x="780" y="480" width="170" height="55" as="geometry" />
+          <mxGeometry x="940" y="565" width="160" height="55" as="geometry" />
         </mxCell>
 
         <!-- Path edges -->
@@ -84,55 +103,48 @@
         <mxCell id="e_relay2" value="WireGuard relay (remote)" style="endArrow=block;html=1;strokeColor=#D85A30;dashed=1;strokeWidth=2;" edge="1" parent="1" source="eot" target="rogal">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="e_rogal_ultra" style="endArrow=block;html=1;strokeColor=#888780;" edge="1" parent="1" source="rogal" target="pg_ultra">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="e_rogal_custodes" style="endArrow=block;html=1;strokeColor=#888780;" edge="1" parent="1" source="rogal" target="pg_custodes">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-
         <!-- Legend -->
         <mxCell id="legend" value="Legend" style="rounded=1;arcSize=6;dashed=1;strokeColor=#888780;fillColor=none;verticalAlign=top;fontStyle=1;fontSize=13;align=left;spacingLeft=10;spacingTop=6;" vertex="1" parent="1">
-          <mxGeometry x="100" y="700" width="880" height="160" as="geometry" />
+          <mxGeometry x="100" y="840" width="1020" height="160" as="geometry" />
         </mxCell>
         <mxCell id="leg_hardline_line" style="endArrow=none;html=1;strokeColor=#2E86C1;strokeWidth=2;" edge="1" parent="1">
           <mxGeometry relative="1" as="geometry">
-            <mxPoint x="120" y="740" as="sourcePoint" />
-            <mxPoint x="180" y="740" as="targetPoint" />
+            <mxPoint x="120" y="880" as="sourcePoint" />
+            <mxPoint x="180" y="880" as="targetPoint" />
           </mxGeometry>
         </mxCell>
         <mxCell id="leg_hardline_text" value="Physical hardline (when at home)" style="text;html=1;align=left;fontSize=12;" vertex="1" parent="1">
-          <mxGeometry x="190" y="728" width="320" height="24" as="geometry" />
+          <mxGeometry x="190" y="868" width="320" height="24" as="geometry" />
         </mxCell>
         <mxCell id="leg_relay_line" style="endArrow=none;html=1;strokeColor=#D85A30;dashed=1;strokeWidth=2;" edge="1" parent="1">
           <mxGeometry relative="1" as="geometry">
-            <mxPoint x="120" y="770" as="sourcePoint" />
-            <mxPoint x="180" y="770" as="targetPoint" />
+            <mxPoint x="120" y="910" as="sourcePoint" />
+            <mxPoint x="180" y="910" as="targetPoint" />
           </mxGeometry>
         </mxCell>
         <mxCell id="leg_relay_text" value="WireGuard relay (remote, CGNAT-safe)" style="text;html=1;align=left;fontSize=12;" vertex="1" parent="1">
-          <mxGeometry x="190" y="758" width="320" height="24" as="geometry" />
+          <mxGeometry x="190" y="898" width="320" height="24" as="geometry" />
         </mxCell>
         <mxCell id="leg_local_line" style="endArrow=none;html=1;strokeColor=#888780;strokeWidth=1;" edge="1" parent="1">
           <mxGeometry relative="1" as="geometry">
-            <mxPoint x="120" y="800" as="sourcePoint" />
-            <mxPoint x="180" y="800" as="targetPoint" />
+            <mxPoint x="120" y="940" as="sourcePoint" />
+            <mxPoint x="180" y="940" as="targetPoint" />
           </mxGeometry>
         </mxCell>
         <mxCell id="leg_local_text" value="Local routing within EoM" style="text;html=1;align=left;fontSize=12;" vertex="1" parent="1">
-          <mxGeometry x="190" y="788" width="320" height="24" as="geometry" />
+          <mxGeometry x="190" y="928" width="320" height="24" as="geometry" />
         </mxCell>
         <mxCell id="leg_gui_line" style="endArrow=block;html=1;strokeColor=#534AB7;" edge="1" parent="1">
           <mxGeometry relative="1" as="geometry">
-            <mxPoint x="120" y="830" as="sourcePoint" />
-            <mxPoint x="180" y="830" as="targetPoint" />
+            <mxPoint x="120" y="970" as="sourcePoint" />
+            <mxPoint x="180" y="970" as="targetPoint" />
           </mxGeometry>
         </mxCell>
         <mxCell id="leg_gui_text" value="Host -&gt; its management GUI" style="text;html=1;align=left;fontSize=12;" vertex="1" parent="1">
-          <mxGeometry x="190" y="818" width="320" height="24" as="geometry" />
+          <mxGeometry x="190" y="958" width="320" height="24" as="geometry" />
         </mxCell>
         <mxCell id="leg_note" value="CGNAT blocks any inbound connection to the home network. Both VS and Rogal_Dorn dial outbound to Eye_of_Terror's public IP, which forwards traffic between them." style="text;html=1;align=left;fontSize=11;fontColor=#5F5E5A;whiteSpace=wrap;" vertex="1" parent="1">
-          <mxGeometry x="540" y="728" width="420" height="80" as="geometry" />
+          <mxGeometry x="580" y="868" width="500" height="80" as="geometry" />
         </mxCell>
 
       </root>
