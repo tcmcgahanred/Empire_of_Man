@@ -1,9 +1,7 @@
 # empire_of_man — Master Build Log & Changelog
 
 This document consolidates the full project history: the original
-2025 SOCaaS/MSSP-era infrastructure work (R640 + pfSense + Ubuntu, done
-via ChatGPT) and the 2026 detection-engineering-focused rebuild (done via
-Claude). Cleaned up and de-duplicated from source notes — no content
+2025 SOCaaS/MSSP-era infrastructure work (R640 + pfSense + Ubuntu) and the 2026 detection-engineering-focused rebuild). Cleaned up and de-duplicated from source notes — no content
 removed, only reorganized and duplicate sections collapsed.
 
 ---
