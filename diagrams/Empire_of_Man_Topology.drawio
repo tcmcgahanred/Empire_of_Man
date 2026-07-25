@@ -92,6 +92,15 @@
         <mxCell id="hive" value="Hive_Primus&#10;planned victim - Windows" style="whiteSpace=wrap;html=1;rounded=1;arcSize=10;dashed=1;fillColor=#F1EFE8;strokeColor=#888780;" vertex="1" parent="1">
           <mxGeometry x="960" y="965" width="160" height="55" as="geometry" />
         </mxCell>
+        <mxCell id="hive_secundus" value="Hive_Secundus&#10;OS: Ubuntu Server 26.04 LTS&#10;Docker host (Vulhub targets)&#10;ens34 - 192.168.2.104/24" style="whiteSpace=wrap;html=1;rounded=1;arcSize=10;fillColor=#E1F5EE;strokeColor=#0F6E56;align=left;spacingLeft=8;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="940" y="1040" width="200" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="wp2shell" value="WordPress container&#10;CVE-2026-63030 / 60137 (wp2shell)" style="whiteSpace=wrap;html=1;rounded=1;arcSize=10;fillColor=#E1F5EE;strokeColor=#0F6E56;align=left;spacingLeft=8;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="940" y="1150" width="200" height="65" as="geometry" />
+        </mxCell>
+        <mxCell id="e_hive_wp2shell" style="endArrow=block;html=1;strokeColor=#5F5E5A;" edge="1" parent="1" source="hive_secundus" target="wp2shell">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
 
         <!-- Path edges -->
         <mxCell id="e_hardline" value="hardline (at home)" style="endArrow=block;html=1;strokeColor=#2E86C1;strokeWidth=2;" edge="1" parent="1" source="vs_wg" target="rogal">
