@@ -1709,3 +1709,238 @@ attack exercises begin.
 - [ ] Update topology PNG in diagrams/
 - [ ] Full README update (deferred)
 - [ ] Terraform setup for multi-VM provisioning (future session)
+---
+
+## [2026-07-25] Session 17 — Eye_of_Terror Logging, Docker Host Build, Vulhub
+
+### Summary
+Closed out host-level Wazuh logging on Eye_of_Terror, made final decisions
+on victim VM architecture (Docker/Vulhub for Linux, full VMs for Windows —
+no container path exists for Windows), built and provisioned the first
+Docker host (`Hive_Secundus`), and cloned Vulhub. Also updated the topology
+diagram and README.
+
+### Eye_of_Terror — Wazuh Agent Renamed
+- Agent had auto-registered under its AWS hostname (`ip-172-31-37-109`)
+  instead of a readable name
+- **Key lesson confirmed:** Wazuh does not support renaming an agent in
+  place, via CLI or GUI — the only supported path is remove + re-register
+- Removed via `manage_agents` (R, agent ID 002) on Guilliman
+- Re-registered from Eye_of_Terror with explicit name:
+  ```bash
+  sudo systemctl stop wazuh-agent
+  sudo /var/ossec/bin/agent-auth -m 192.168.1.100 -A Eye_of_Terror
+  sudo systemctl start wazuh-agent
+  ```
+- Confirmed showing as `Eye_of_Terror`, Active, in Guilliman's dashboard
+
+### Eye_of_Terror — Host Log Sources Added
+- Added to `/var/ossec/etc/ossec.conf` (alongside existing default
+  `<localfile>` blocks, including default `journald` coverage already
+  present):
+  ```xml
+  <localfile>
+    <log_format>syslog</log_format>
+    <location>/var/log/auth.log</location>
+  </localfile>
+  <localfile>
+    <log_format>syslog</log_format>
+    <location>/var/log/syslog</location>
+  </localfile>
+  ```
+- Restarted agent, confirmed `active (running)`, all subprocesses up
+- **Validated end-to-end:** deliberate failed SSH login
+  (`ssh nonexistentuser@<Eye_of_Terror IP>`) confirmed visible in
+  Guilliman's dashboard within ~30-60s
+- **Deferred (not implemented):** WireGuard handshake-polling script
+  (peer liveness monitoring) and iptables drop logging — judged
+  non-standard/high-effort relative to value right now; revisit after
+  the range is further built out. Rationale: Wazuh's rule engine
+  reacts to events as they arrive, it doesn't natively evaluate log
+  timestamp age, so alerting on stale handshakes would require the
+  polling script itself to calculate staleness and emit a distinctly
+  matchable log line — real but nontrivial custom logic.
+
+### Victim VM Architecture — Decisions Finalized
+- **Linux targets:** Docker + Vulhub on a dedicated Ubuntu Server host,
+  **default bridge networking** (not macvlan) — containers differentiated
+  by port on the host's single IP, not by distinct per-container IPs
+  - Reasoning: macvlan requires ESXi's Forged Transmits vSwitch policy
+    to be set to Accept (unconfirmed/untested); bridge mode sidesteps
+    that entirely and was judged sufficient for CVE-specific
+    exploit-and-detect exercises given time/resources aren't the binding
+    constraint
+  - 1:many reverse-proxy routing (nginx/Traefik, hostname-based instead
+    of port-based) identified as a future upgrade path, not needed now
+- **Windows targets:** confirmed no container path exists — Vulhub/Docker
+  only support Linux containers (x86 only, no ARM). Windows Server and
+  Windows Desktop targets require full VMs, no shortcut
+- **Windows Server 2008 R2 (original Metasploitable3 Windows target)
+  sourcing dead-ended:**
+  - Microsoft's official evaluation download for 2008 R2 x64 (id=11093)
+    now redirects to the Itanium-only page (id=22077) — x64 evaluation
+    has been pulled from Microsoft's site entirely
+  - Only remaining source is unofficial Internet Archive re-uploads —
+    rejected in favor of pivoting to a modern Windows Server version
+- **Pivoted to modern Windows Server (2019/2022)** — both confirmed
+  still live on Microsoft's official Evaluation Center, 180-day eval
+  - Licensing/lifespan resolved: `slmgr /rearm` allows up to 6 resets of
+    the 180-day evaluation clock without reinstalling or losing
+    configuration — approx. 3 years total runway on a single install
+  - Trade-off accepted deliberately: loses EternalBlue/MS17-010-specific
+    practice, gains realistic modern attack surface (PrintNightmare,
+    Zerologon, etc. — specific CVE choice deferred, judged premature/
+    narrow-scoping to lock in one CVE before the VM even exists)
+  - Still not yet built — remains an open item
+
+### Docker Host VM Built — Hive_Secundus
+- **Naming:** `Hive_Primus` (original name for the PG-Custodes Windows
+  victim slot per the 2026-07-12 plan) reserved for the future Windows
+  Server target. New Docker/Linux host named **Hive_Secundus** instead.
+- **Specs:** 2 vCPU, 4096 MB RAM, 40-60GB thin-provisioned disk, network
+  adapter on PG-Custodes port group
+- **OS:** Ubuntu Server 26.04 LTS (standard install, not minimized —
+  deliberate choice to keep full default tooling available)
+- Installer offered **Ubuntu Server** vs **Ubuntu Server (minimized)** —
+  went with standard
+- **Network — DHCP anomaly flagged:** installer auto-assigned
+  `192.168.2.104/24` via DHCP despite PG-Custodes being documented as
+  DHCP-disabled/static-only. Switched to manual/static configuration
+  as planned, but the underlying cause (DHCP apparently active on
+  PG-Custodes) was not investigated this session — **open item to
+  check Rogal_Dorn's DHCP config on PG-Custodes**
+- **Final static config:**
+  - Address: `192.168.2.104/24`
+  - Gateway: `192.168.2.1`
+  - Interface: `ens34`
+- Hostname: `hivesecundus`; username: `magus`
+- OpenSSH server installed during setup
+- Skipped all featured snaps (explicitly declined Docker-via-snap and
+  microk8s) — Docker installed via official apt repo instead;
+  microk8s judged out of scope (full orchestration platform, not
+  needed for single-host manual `docker compose up/down` workflow)
+- **Password note:** deliberately left as a weak/simple credential.
+  Rationale discussed and accepted: PG-Custodes is not internet-facing
+  (only Eye_of_Terror has a public IP), password-complexity practice
+  has no offensive-skill training value once credential attacks are
+  already understood, and the real training value of this range lives
+  in exploitation + detection engineering, not in cracking the host's
+  own login. Accepted risk: Alpharius (Kali) sits on the same segment,
+  so a weak credential here is only safe under disciplined, deliberate
+  targeting — not if broad/untargeted scans of PG-Custodes become part
+  of future exercises.
+
+### Docker Engine Installed (Official Repo Method)
+Followed Docker's official Ubuntu install docs
+(docs.docker.com/engine/install/ubuntu/) exactly:
+```bash
+for pkg in docker.io docker-doc docker-compose podman-docker containerd runc; do sudo apt-get remove $pkg; done
+sudo apt-get update
+sudo apt-get install ca-certificates curl
+sudo install -m 0755 -d /etc/apt/keyrings
+sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+sudo chmod a+r /etc/apt/keyrings/docker.asc
+echo \
+  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
+  $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
+  sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+sudo apt-get update
+sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+```
+- **Confirmed:** Docker's repo already has full support for Ubuntu 26.04's
+  codename (`resolute`) — no fallback/pinning needed
+- **Transient failure encountered:** first `docker run hello-world` pull
+  failed with a DNS resolution error on
+  `production.cloudfront.docker.com` (`no such host` via
+  `127.0.0.53`). Diagnosed as transient, not a real config problem —
+  `resolvectl status` confirmed correct DNS server (192.168.2.1),
+  `nslookup` on the same domain succeeded moments later, and a retry of
+  `docker run hello-world` completed successfully (image pulled, test
+  container ran). Theory noted but unconfirmed: the domain resolves
+  both A and AAAA records, and this host has no IPv6 configured — a
+  first-attempt IPv6 lookup timeout could explain a one-off failure
+  like this, but it wasn't proven, only worked around by retrying.
+- **Docker Engine confirmed working** via successful `hello-world` run
+
+### Vulhub Cloned
+```bash
+git clone https://github.com/vulhub/vulhub.git
+cd vulhub
+```
+- Confirmed present: a folder for **CVE-2026-63030 / CVE-2026-60137
+  ("wp2shell")** — the critical unauthenticated WordPress Core RCE
+  chain disclosed 2026-07-17, actively exploited in the wild as of
+  2026-07-18 through 2026-07-20. Not yet stood up — README review and
+  `docker compose up` deferred to next session.
+
+### Topology Diagram (`diagrams/empire_of_man_topology.drawio`) Updated
+- Added confirmed OS/version detail: Rogal_Dorn ("pfSense,
+  FreeBSD-based"), Guilliman ("Ubuntu Server 26.04 LTS", "Wazuh manager
+  4.14.6" — corrected from previously recorded 4.14.5), Eye_of_Terror
+  ("Ubuntu LTS")
+- Added `whiteSpace=wrap;html=1;` to all node styles — text was
+  overflowing box boundaries before this fix
+- Increased vertical spacing throughout (VS → Eye_of_Terror → Rogal_Dorn
+  → vSwitch-palace → PG segments → legend) — previously cramped, with
+  vSwitch-palace nearly touching the PG segment containers
+- Confirmed via local XML validation (`xml.etree.ElementTree`) after
+  every edit — no malformed XML introduced
+
+### README.md Updated
+- Added new `## 🗺️ Topology` section referencing the diagram
+- Fixed a recurring problem: embedding images via GitHub's
+  `user-attachments` one-time upload links (created by pasting an
+  image directly into the GitHub web editor) doesn't work for updates —
+  those links are content-addressed and permanent, not reusable. Fixed
+  by switching to a relative repo path (`diagrams/topology_<name>.png`)
+  instead, so future diagram updates only require overwriting the PNG
+  at that path, not re-editing the README
+- Moved Security Onion from "Planned" to "Current Capabilities"; checked
+  off the corresponding roadmap item; updated "Current Scope" to name
+  both VLANs and Security Onion's role explicitly
+
+### Key Lessons Learned
+- Wazuh agent names cannot be changed once registered, on any Wazuh
+  version, via CLI or GUI — remove and re-register is the only path
+  (acceptable since a new agent has no meaningful log history to lose)
+- Windows evaluation media sourcing degrades over time as Microsoft
+  retires old evaluation download pages — don't assume an older OS
+  eval ISO will remain officially available; verify before committing
+  a build plan to it
+- Windows Server evaluation `rearm` (up to 6 resets) provides ~3 years
+  of runway on a single install without reinstalling — this fully
+  resolves "the eval period is too short" concerns for a lab context
+- Vulhub and Docker in general have zero Windows-container support —
+  this is a hard architectural boundary, not a configuration gap to
+  work around
+- GitHub's `user-attachments` image links (from pasting an image into
+  the web editor) are one-time/permanent — never reusable for updating
+  a diagram in place. Always reference a real file path in the repo
+  instead.
+- A DHCP lease appearing on a segment documented as DHCP-disabled is
+  worth investigating even if a workaround (manual static config) is
+  applied in the moment — root cause not yet confirmed on PG-Custodes
+
+### Open Items
+- [ ] Investigate why PG-Custodes handed out a DHCP lease
+      (`192.168.2.104`) despite being documented as DHCP-disabled
+- [ ] Stand up wp2shell (CVE-2026-63030 / CVE-2026-60137) on
+      Hive_Secundus via `docker compose up`, validate exploitation
+- [ ] Extend Security Onion (Valdor) visibility to PG-Custodes — sniffing
+      NIC currently only covers PG-Ultramarines; needs either a second
+      sniffing interface on Valdor or a port-mirror/SPAN config on
+      `vSwitch-palace`. Whether free-tier ESXi's vSwitch even supports
+      port mirroring is unconfirmed.
+- [ ] Configure Wazuh `docker-listener` wodule on Hive_Secundus (host
+      level) to capture container lifecycle events; configure Docker
+      logging driver or volume-mounted logs so Vulhub app-level logs
+      (e.g. HTTP access logs for wp2shell) reach Wazuh/Suricata
+- [ ] Build Windows Server VM (2019 or 2022 eval) on PG-Custodes —
+      Hive_Primus name reserved for this
+- [ ] Deferred: WireGuard handshake-polling script and iptables drop
+      logging on Eye_of_Terror
+- [ ] Deferred: Docker/Vulhub host provisioning automation (Packer +
+      Ubuntu autoinstall) — judged worth revisiting only after seeing
+      how the manual Hive_Secundus workflow plays out in practice
+- [ ] Export and commit updated topology PNG; verify README image
+      renders correctly on GitHub
