@@ -63,12 +63,11 @@ Both EoM (`Rogal_Dorn`) and VS dial **outbound** to this relay rather than accep
 
 ## 🗺️ Topology
 
-<img width="962" height="832" alt="topology_v20260720" src="https://github.com/user-attachments/assets/1c2a38b2-fa4b-45b9-bf6a-23c1b014956f" />
-
+![Empire of Man network topology](diagrams/topology_v20260725.png)
 
 *Maintained in [draw.io](https://app.diagrams.net/); source file at [`diagrams/empire_of_man_topology.drawio`](diagrams/empire_of_man_topology.drawio).*
 
----diagrams/topology_v20260725.png
+---
 
 ## 🛠️ Core Capabilities (Current)
 
