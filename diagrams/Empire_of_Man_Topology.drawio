@@ -1,6 +1,6 @@
 <mxfile host="app.diagrams.net">
   <diagram name="Empire of Man Topology" id="eom-topology-2">
-    <mxGraphModel dx="1600" dy="1200" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1200" pageHeight="2220" math="0" shadow="0">
+    <mxGraphModel dx="1600" dy="1200" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1950" pageHeight="2220" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -76,23 +76,38 @@
           <mxGeometry x="380" y="1100" width="200" height="55" as="geometry" />
         </mxCell>
 
-        <!-- Ordo_Xenos - independent second firewall for PG-Inquisition -->
-        <mxCell id="ordo_xenos" value="Ordo_Xenos&#10;OS: pfSense (FreeBSD-based)&#10;vmx0 - WAN - Eero (shared), DHCP&#10;vmx1 - trunk parent -&gt; VLAN10 sub-if&#10;VLAN10 - LAN - PG-Inquisition, 192.168.5.1/24" style="whiteSpace=wrap;html=1;rounded=1;arcSize=10;fillColor=#E1F5EE;strokeColor=#0F6E56;align=left;spacingLeft=8;fontSize=12;" vertex="1" parent="1">
-          <mxGeometry x="820" y="610" width="340" height="150" as="geometry" />
+        <!-- Conclave - independent second firewall for PG-Ordo_Xenos (own vSwitch) -->
+        <mxCell id="ordo_xenos" value="Conclave&#10;OS: pfSense (FreeBSD-based)&#10;vmx0 - WAN - VM Network (Eero), DHCP&#10;vmx1 - LAN - PG-Ordo_Xenos, 192.168.5.1/24" style="whiteSpace=wrap;html=1;rounded=1;arcSize=10;fillColor=#E1F5EE;strokeColor=#0F6E56;align=left;spacingLeft=8;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="1240" y="500" width="360" height="130" as="geometry" />
         </mxCell>
-        <mxCell id="ordo_gui" value="Ordo_Xenos web GUI" style="whiteSpace=wrap;html=1;rounded=1;arcSize=10;fillColor=#EEEDFE;strokeColor=#534AB7;" vertex="1" parent="1">
-          <mxGeometry x="860" y="775" width="260" height="40" as="geometry" />
+        <mxCell id="ordo_gui" value="Conclave web GUI" style="whiteSpace=wrap;html=1;rounded=1;arcSize=10;fillColor=#EEEDFE;strokeColor=#534AB7;" vertex="1" parent="1">
+          <mxGeometry x="1640" y="545" width="200" height="40" as="geometry" />
         </mxCell>
         <mxCell id="e_ordo_gui" style="endArrow=block;html=1;strokeColor=#534AB7;" edge="1" parent="1" source="ordo_xenos" target="ordo_gui">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="e_rogal_ordo" value="same WAN (Eero)" style="endArrow=none;html=1;strokeColor=#888780;dashed=1;fontSize=10;" edge="1" parent="1" source="rogal" target="ordo_xenos">
+        <mxCell id="vm_network" value="VM Network (vSwitch0)&#10;uplink vmnic0 &#8594; Eero" style="whiteSpace=wrap;html=1;rounded=1;arcSize=10;fillColor=#F1EFE8;strokeColor=#5F5E5A;fontStyle=1;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="960" y="448" width="230" height="48" as="geometry" />
+        </mxCell>
+        <mxCell id="e_vmnet_eero" value="uplink" style="endArrow=none;html=1;strokeColor=#888780;dashed=1;fontSize=10;" edge="1" parent="1" source="vm_network" target="eero_wan">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="e_ordo_vswitch" value="vmx1 trunk" style="endArrow=block;html=1;strokeColor=#5F5E5A;fontSize=11;" edge="1" parent="1" source="ordo_xenos" target="vswitch">
+        <mxCell id="eero_wan" value="Eero (home router)&#10;192.168.4.0/24 &#183; CGNAT" style="whiteSpace=wrap;html=1;rounded=1;arcSize=10;fillColor=#F1EFE8;strokeColor=#5F5E5A;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="1010" y="345" width="200" height="46" as="geometry" />
+        </mxCell>
+        <mxCell id="e_conclave_wan" value="WAN" style="endArrow=none;html=1;strokeColor=#888780;dashed=1;fontSize=10;" edge="1" parent="1" source="ordo_xenos" target="vm_network">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="e_vswitch_inquisition" value="PG-Inquisition" style="endArrow=block;html=1;strokeColor=#5F5E5A;fontSize=11;" edge="1" parent="1" source="vswitch" target="pg_inquisition">
+        <mxCell id="e_rogal_ordo" value="WAN" style="endArrow=none;html=1;strokeColor=#888780;dashed=1;fontSize=10;" edge="1" parent="1" source="rogal" target="vm_network">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="vswitch_inq" value="vSwitch-inquisition&#10;(internal-only, no uplink)" style="whiteSpace=wrap;html=1;rounded=1;arcSize=10;fillColor=#F1EFE8;strokeColor=#5F5E5A;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1300" y="715" width="240" height="55" as="geometry" />
+        </mxCell>
+        <mxCell id="e_ordo_vswitch" value="vmx1 - LAN" style="endArrow=block;html=1;strokeColor=#5F5E5A;fontSize=11;" edge="1" parent="1" source="ordo_xenos" target="vswitch_inq">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_vswitch_inquisition" value="PG-Ordo_Xenos" style="endArrow=block;html=1;strokeColor=#5F5E5A;fontSize=11;" edge="1" parent="1" source="vswitch_inq" target="pg_inquisition">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
 
@@ -123,7 +138,7 @@
         </mxCell>
 
         <!-- Path edges -->
-        <mxCell id="e_hardline" value="hardline (at home)" style="endArrow=block;html=1;strokeColor=#2E86C1;strokeWidth=2;" edge="1" parent="1" source="vs_wg" target="rogal">
+        <mxCell id="e_hardline" value="hardline / home LAN (at home)" style="endArrow=block;html=1;strokeColor=#2E86C1;strokeWidth=2;" edge="1" parent="1" source="vs_wg" target="eero_wan">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="e_relay1" value="" style="endArrow=block;html=1;strokeColor=#D85A30;dashed=1;strokeWidth=2;" edge="1" parent="1" source="vs_wg" target="eot">
@@ -133,12 +148,12 @@
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
 
-        <!-- PG-Inquisition segment -->
-        <mxCell id="pg_inquisition" value="PG-Inquisition - VLAN 10 (trunked)&#10;192.168.5.0/24 - outbound-only" style="whiteSpace=wrap;html=1;rounded=1;arcSize=8;fillColor=#F1EFE8;strokeColor=#5F5E5A;verticalAlign=top;fontStyle=1;fontSize=13;" vertex="1" parent="1">
-          <mxGeometry x="100" y="1300" width="1040" height="180" as="geometry" />
+        <!-- PG-Ordo_Xenos segment -->
+        <mxCell id="pg_inquisition" value="PG-Ordo_Xenos (untagged)&#10;192.168.5.0/24 - outbound-only" style="whiteSpace=wrap;html=1;rounded=1;arcSize=8;fillColor=#F1EFE8;strokeColor=#5F5E5A;verticalAlign=top;fontStyle=1;fontSize=13;" vertex="1" parent="1">
+          <mxGeometry x="1240" y="830" width="420" height="360" as="geometry" />
         </mxCell>
         <mxCell id="ravenor" value="Interrogator_Ravenor&#10;OS: Ubuntu Server 24.04&#10;OSINT collector - /opt/ravenor&#10;ens34 - 192.168.5.10/24" style="whiteSpace=wrap;html=1;rounded=1;arcSize=10;fillColor=#E1F5EE;strokeColor=#0F6E56;align=left;spacingLeft=8;fontSize=12;" vertex="1" parent="1">
-          <mxGeometry x="120" y="1345" width="280" height="100" as="geometry" />
+          <mxGeometry x="1270" y="890" width="360" height="110" as="geometry" />
         </mxCell>
 
         <!-- Legend -->
