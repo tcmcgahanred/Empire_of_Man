@@ -4040,3 +4040,233 @@ itself.
 - [ ] Export/commit updated topology PNG reflecting Hive_Secundus and
       the wp2shell container as built/live (already updated in the
       `.drawio` source this session)
+---
+
+## [2026-07-26] Session 19 — PG-Inquisition Planned (CTI Collection Segment)
+
+### Summary
+Received a handoff block from a parallel CTI-collection-focused chat
+describing a new, deliberately isolated network segment and VM for the
+personal OSINT/weekly-brief pipeline. Not yet built at the time —
+planning only. Also discovered and diagnosed (but did not fix) a
+separate ESXi remote-access gap while traveling.
+
+### PG-Inquisition — New Segment (Planned)
+- Deliberately isolated from the lab segments — opposite risk profile
+  from the attack-lab VLANs: heavy *outbound* connections (OSINT feed
+  collection) vs. segments built to be attacked inbound. Nothing on
+  this segment should ever accept inbound traffic.
+- **Naming note (deliberate):** breaks the legion-naming convention used
+  for `PG-Ultramarines`/`PG-Custodes`, since "Inquisition" isn't a Space
+  Marine legion — intentional, signals this segment is conceptually
+  separate from the Heresy-era combat lab.
+- **Naming correction applied:** handoff draft used "PG-Inquisitor" —
+  corrected to the settled name **PG-Inquisition**
+
+### Interrogator_Ravenor — New VM (Planned)
+- Ubuntu Server 24.04. Specs: 2 vCPU, 4GB RAM (6GB if running both
+  agents), 40GB thin disk. Runs 24/7, auto-start with delay.
+- **Job:** OSINT collection for the personal weekly CTI brief pipeline —
+  a Python service pulls RSS feeds, extracts article text, dedupes by
+  content hash, writes a dated corpus
+- Installed at `/opt/ravenor`, systemd timers, dedicated service user
+  `ravenor`. Google Drive mounted via `rclone` so the corpus is
+  reachable by an external analysis layer that cannot reach the LAN.
+- **Monitoring plan:** Wazuh agent → Lord_Commander_Guilliman; sniffing
+  NIC on the segment feeding Constantin_Valdor (same bond-extension
+  pattern as PG-Custodes in Session 18). **Caveat:** FIM must exclude
+  the data directories and rclone mount, or constant file writes will
+  flood the Wazuh manager.
+
+### Future (Not Yet Planned in Detail)
+- A STIX/TAXII server on the segment or a sibling one — this would be
+  **inbound-facing**, unlike Ravenor, needing its own segmentation.
+
+### Note — ESXi Remote Access Gap Identified (Same Session, While Traveling)
+- ESXi Host Client (`https://192.168.4.245`) confirmed **unreachable
+  through the Webway WireGuard tunnel**, even with the tunnel itself
+  fully healthy (VS → Eye_of_Terror → Rogal_Dorn → Guilliman all
+  pinged cleanly)
+- **Root cause:** ESXi's management interface sits on the same physical
+  network as Rogal_Dorn's WAN interface (the Eero's own LAN,
+  `192.168.4.0/24`), not behind Rogal_Dorn on either VLAN. Reaching it
+  through the tunnel would require NAT reflection/hairpin routing on
+  Rogal_Dorn, which pfSense does not do by default
+- Fix needs two things together: (1) add `192.168.4.0/24` to
+  `AllowedIPs` on both VS's and Rogal_Dorn's WireGuard peer configs,
+  and (2) configure NAT reflection on Rogal_Dorn — **deferred until
+  physically home**, since routing changes to Rogal_Dorn are safer to
+  verify locally
+
+---
+
+## [2026-07-31] Session 20 — Kali xrdp/xorgxrdp Dead End, PG-Inquisition Architecture Pivot, Ordo_Xenos Build Started
+
+### Summary
+Long session covering three distinct threads: (1) an extensive, ultimately-abandoned attempt to get GUI/RDP access to Alpharius via xrdp, which surfaced a genuine Kali packaging gap; (2) a full architecture reconsideration of how to build PG-Inquisition, given a previously-confirmed hard limit on Rogal_Dorn; and (3) the start of the actual build using the safer architecture — a second, independent pfSense firewall (`Ordo_Xenos`) rather than retrofitting Rogal_Dorn.
+
+### xrdp / xorgxrdp on Alpharius — Diagnosed Root Cause, No Working Fix, Abandoned
+- Goal: GUI remote access to Alpharius's Kali desktop while traveling
+  (ESXi console unreachable per Session 19's remote-access gap)
+- `xrdp` installed and ran cleanly (service active, listening on 3389,
+  RDP handshake from Windows `mstsc` succeeded), but session creation
+  failed: `Can't create session for user alpharius - X server could
+  not be started`
+- **Root cause diagnosed, step by step:**
+  - `xorgxrdp` (the companion package that lets xrdp spawn an actual
+    X11 session) had **zero installation candidate** — confirmed via
+    `apt-cache policy`, not just a display quirk
+  - Ruled out: wrong package name (matches official Kali docs
+    verbatim), deprecated/renamed package (confirmed present in Kali's
+    *public package tracker*, version 1:0.10.5-2, imported April 2026),
+    local repo misconfiguration (`sources.list` correct, all four
+    standard components present), stale local apt cache (fully cleared
+    and re-fetched — same result, even from a different mirror)
+  - Confirmed via raw-file inspection (`zgrep` directly into the
+    downloaded `Packages` index) that `xorgxrdp` is genuinely absent
+    from the package index data itself — not an apt parsing/display
+    issue
+  - Tested two different mirrors (default geo-redirect + explicit
+    `kali.download`) — both showed the same absence
+  - **Actual finding:** the `.deb` file physically exists in Kali's
+    file pool (`xorgxrdp_0.10.5-2_amd64.deb`, confirmed via direct pool
+    browse) but is not listed in the `Packages` index apt downloads —
+    a genuine Kali packaging/publishing pipeline gap, not a local
+    misconfiguration or user error
+  - Manually downloaded and installed the `.deb` directly via `dpkg -i`
+    (bypassing apt's broken index) — installed cleanly, but turned out
+    the package was already present (installed as an unlisted
+    dependency at some point)
+  - **After install, X session did start** (confirmed via
+    `~/.xsession-errors` showing successful "Xsession: X session
+    started" three times, XFCE loading normally) — but the RDP
+    connection disconnected immediately after login with no visible
+    error, before ever displaying a desktop to the client
+  - Consistent with a known, documented class of bug: version mismatch
+    between `xrdp` (`0.10.6.1-2+kali1`, Kali-patched) and `xorgxrdp`
+    (`1:0.10.5-2`, close but not exactly matched) causing immediate
+    post-login disconnects
+- **Decision: abandoned RDP/xrdp entirely.** Given the dead end was
+  root-caused (real Kali packaging gap, not solvable from the user
+  side) rather than abandoned prematurely, and given CLI/SSH access
+  already covers 100% of what was actually used all session (Vulhub,
+  nmap, the wp2shell exploit chain), the practical decision was: no
+  GUI on Alpharius going forward. CLI-via-SSH is standard practice for
+  this kind of work regardless; GUI-only tools (Wireshark, Burp) will
+  run natively on VS instead when needed.
+- X2Go was identified as a viable non-RDP alternative if GUI access is
+  ever revisited, but not pursued once the RDP-specific requirement
+  was dropped.
+
+### PG-Custodes DHCP Investigation — Deferred Again
+- Was the planned next step this session; got fully displaced by the
+  xrdp troubleshooting. **Still open, still unresolved** — now a
+  three-part open item (Hive_Secundus, Valdor's `ens38`, and no
+  confirmed root cause yet from pfSense's own DHCP config).
+
+### PG-Inquisition — Architecture Reconsidered and Changed
+- Original plan (Session 19) assumed PG-Inquisition would be a new
+  interface directly on Rogal_Dorn. **This was walked back** once it
+  was remembered/confirmed that Rogal_Dorn has a **confirmed hard
+  limit of 3 NICs** (the "4-NIC ESXi probe-order bug" from the
+  original 2025 build — the same reason Alpharius never got its own
+  dedicated `PG-Alpharius` VLAN and became a dual-NIC bridge host
+  instead)
+- **Considered and rejected:** VLAN trunking a new tag onto one of
+  Rogal_Dorn's *existing* live interfaces (`vmx2`/PG-Custodes). Real
+  risk assessed: would require re-pointing PG-Custodes' live interface
+  assignment to a new VLAN sub-interface, with a real window of
+  potential disruption to Hive_Secundus, Valdor's dashboard
+  (`192.168.2.10`, hosted on this segment), and Valdor's Custodes-side
+  sniffing bond member. Untested technique for this lab. Rejected as
+  too much blast radius for a "nice to have" segment addition.
+- **Decision: build a second, fully independent pfSense VM
+  (`Ordo_Xenos`)** rather than touch Rogal_Dorn at all.
+  - Zero risk to any existing segment or service — entirely new VM,
+    new vNICs, no shared config with Rogal_Dorn
+  - Genuinely stronger isolation than a VLAN trunk on shared hardware
+    would provide — a compromise of PG-Inquisition would face a
+    separate firewall, not just a different VLAN behind the same box
+  - Fits the "Ravenor does real, live work" framing — dedicated
+    firewall infrastructure for the one segment doing actual
+    production CTI work, separate from the experimental attack range
+  - Webway/WireGuard remote access is not automatic for a new firewall
+    — would need its own keypair, added as a new peer on Eye_of_Terror,
+    plus `AllowedIPs` updates on relevant peers if remote management of
+    this segment is ever needed. **Not yet done** — deferred pending
+    confirmation of actual need, since Ravenor's design principle is
+    outbound-only with no stated requirement for remote inbound
+    management access.
+
+### Naming — Lore-Verified, Not Just Thematic
+- Researched actual Warhammer 40K Imperial hierarchy before finalizing
+  names. Corrected a mistaken assumption that the Inquisition falls
+  under the Administratum — **confirmed the Inquisition is a fully
+  independent body, outside the Adeptus Terra chain of command
+  entirely** (a genuine thematic match for PG-Inquisition's deliberate
+  isolation from the rest of the lab's Astartes-side hierarchy)
+- Confirmed via research: Gideon Ravenor (already named
+  `Interrogator_Ravenor`) is canonically a member of the **Ordo Xenos**
+  specifically, a former Interrogator (the correct in-universe rank
+  for an Inquisitor's apprentice) under Inquisitor Gregor Eisenhorn
+- **New firewall named `Ordo_Xenos`** — not arbitrary, it's Ravenor's
+  actual parent organization in the source material. Naming
+  relationship: `Ordo_Xenos` (firewall, creates/governs the segment) →
+  `PG-Inquisition` (the segment itself) → `Interrogator_Ravenor` (VM
+  living on that segment)
+
+### Ordo_Xenos — Build Started
+- **ESXi port group `PG-Inquisition` created** on `vSwitch-palace`,
+  set to **VLAN ID `4095` (VGT/trunk mode) from creation** — a
+  deliberate choice to bake in VLAN sub-interface capability from day
+  one, rather than retrofitting it later under risk (as would have
+  been required on Rogal_Dorn). Security/Promiscuous Mode confirmed
+  correctly inherited from `vSwitch-palace` (Accept) — matches the
+  same pattern already validated for PG-Custodes in Session 18, no
+  override needed.
+- **VM shell created:** `Ordo_Xenos`, guest OS FreeBSD 14-or-later
+  (64-bit) — selected as the correct ESXi compatibility bucket even
+  though current pfSense CE (2.8.1) actually runs FreeBSD 15, since
+  ESXi's guest profiles are broad version buckets, not exact pins.
+  1 vCPU, 1-2GB RAM, 8-16GB thin disk. Two network adapters: `vmx0`
+  (WAN-side, same bridged network as Rogal_Dorn's WAN) and `vmx1`
+  (connected to the new trunked `PG-Inquisition` port group).
+- **pfSense install in progress:**
+  - `vmx0` assigned as WAN, DHCP client (correct — receives an address
+    from the Eero, does not serve one)
+  - Said yes to VLAN tagging on `vmx1` (the trunk parent) — this is
+    the intended mechanism for the "bake in VLAN capability" design:
+    the physical NIC stays an unassigned parent, and a VLAN
+    sub-interface is created on top of it, which then gets assigned as
+    LAN. Planned VLAN tag: `10`, description "Inquisition". Priority
+    tag field correctly left at default (0) — that field is 802.1Q QoS
+    priority, unrelated to VLAN identification.
+  - **Blocked at this exact point:** console started showing garbled/
+    gibberish characters on keypress while entering the VLAN tag —
+    unresolved at end of session. Not yet diagnosed; suspected keymap
+    mismatch from the earlier install-time keymap selection step, or a
+    console focus/capture issue similar to the one hit during the
+    original Rogal_Dorn UEFI boot menu (Session 1-era).
+
+### Open Items
+- [ ] Resolve garbled console input on Ordo_Xenos, complete VLAN tag
+      (`10`, "Inquisition") entry, finish pfSense install
+- [ ] Assign the resulting VLAN sub-interface as LAN, static IP
+      `192.168.5.1/24`, configure DHCP server scope for the segment
+- [ ] Build outbound-only firewall rules on Ordo_Xenos (PG-Inquisition
+      must never accept inbound)
+- [ ] Build `Interrogator_Ravenor` VM (Ubuntu Server 24.04, OSINT
+      collector) once Ordo_Xenos/PG-Inquisition networking is confirmed
+- [ ] Extend Valdor's sniffing bond to cover PG-Inquisition (same
+      pattern as the PG-Custodes fix in Session 18)
+- [ ] Configure FIM exclusions for Ravenor's data/Drive-mount paths
+      before enabling Wazuh file integrity monitoring on that host
+- [ ] Decide whether Ordo_Xenos/PG-Inquisition needs Webway/WireGuard
+      remote access at all; if so, generate keypair, add as peer on
+      Eye_of_Terror, update AllowedIPs
+- [ ] Carried forward, still unresolved: PG-Custodes DHCP anomaly
+      (now a 3rd session without investigation), ESXi remote
+      reachability over Webway (NAT reflection + AllowedIPs fix,
+      deferred pending being physically home — now home, not yet done)
+- [ ] Carried forward from Session 17/18: Wazuh agent + container-log
+      forwarding on Hive_Secundus, Windows Server VM (Hive_Primus)
