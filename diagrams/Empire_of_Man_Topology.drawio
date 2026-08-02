@@ -35,7 +35,7 @@
         </mxCell>
 
         <!-- pfSense GUI offshoot -->
-        <mxCell id="pfsense_gui" value="pfSense web GUI" style="whiteSpace=wrap;html=1;rounded=1;arcSize=10;fillColor=#EEEDFE;strokeColor=#534AB7;" vertex="1" parent="1">
+        <mxCell id="pfsense_gui" value="pfSense web GUI (Rogal_Dorn)&#10;https://192.168.1.1" style="whiteSpace=wrap;html=1;rounded=1;arcSize=10;fillColor=#EEEDFE;strokeColor=#534AB7;" vertex="1" parent="1">
           <mxGeometry x="840" y="550" width="160" height="40" as="geometry" />
         </mxCell>
         <mxCell id="e_pf_gui" style="endArrow=block;html=1;strokeColor=#534AB7;" edge="1" parent="1" source="rogal" target="pfsense_gui">
@@ -80,7 +80,7 @@
         <mxCell id="ordo_xenos" value="Conclave&#10;OS: pfSense (FreeBSD-based)&#10;vmx0 - WAN - VM Network (Eero), 192.168.4.255/22&#10;vmx1 - LAN - PG-Ordo_Xenos, 192.168.3.1/24" style="whiteSpace=wrap;html=1;rounded=1;arcSize=10;fillColor=#E1F5EE;strokeColor=#0F6E56;align=left;spacingLeft=8;fontSize=12;" vertex="1" parent="1">
           <mxGeometry x="1240" y="500" width="360" height="130" as="geometry" />
         </mxCell>
-        <mxCell id="ordo_gui" value="Conclave web GUI" style="whiteSpace=wrap;html=1;rounded=1;arcSize=10;fillColor=#EEEDFE;strokeColor=#534AB7;" vertex="1" parent="1">
+        <mxCell id="ordo_gui" value="Conclave web GUI&#10;https://192.168.3.1" style="whiteSpace=wrap;html=1;rounded=1;arcSize=10;fillColor=#EEEDFE;strokeColor=#534AB7;" vertex="1" parent="1">
           <mxGeometry x="1640" y="545" width="200" height="40" as="geometry" />
         </mxCell>
         <mxCell id="e_ordo_gui" style="endArrow=block;html=1;strokeColor=#534AB7;" edge="1" parent="1" source="ordo_xenos" target="ordo_gui">
@@ -90,6 +90,12 @@
           <mxGeometry x="960" y="448" width="230" height="48" as="geometry" />
         </mxCell>
         <mxCell id="e_vmnet_eero" value="uplink" style="endArrow=none;html=1;strokeColor=#888780;dashed=1;fontSize=10;" edge="1" parent="1" source="vm_network" target="eero_wan">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="esxi_host" value="ESXi Host Client (R640)&#10;mgmt https://192.168.4.245" style="whiteSpace=wrap;html=1;rounded=1;arcSize=10;fillColor=#EEEDFE;strokeColor=#534AB7;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="1290" y="345" width="250" height="48" as="geometry" />
+        </mxCell>
+        <mxCell id="e_esxi_eero" value="R640 mgmt (Eero LAN)" style="endArrow=none;html=1;strokeColor=#888780;dashed=1;fontSize=10;" edge="1" parent="1" source="esxi_host" target="eero_wan">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="eero_wan" value="Eero (home router)&#10;192.168.4.0/22 &#183; CGNAT" style="whiteSpace=wrap;html=1;rounded=1;arcSize=10;fillColor=#F1EFE8;strokeColor=#5F5E5A;fontSize=11;" vertex="1" parent="1">
