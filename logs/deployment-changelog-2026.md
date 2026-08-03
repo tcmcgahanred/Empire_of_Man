@@ -2138,3 +2138,71 @@ Long session covering three distinct threads: (1) an extensive, ultimately-aband
       deferred pending being physically home — now home, not yet done)
 - [ ] Carried forward from Session 17/18: Wazuh agent + container-log
       forwarding on Hive_Secundus, Windows Server VM (Hive_Primus)
+
+## [2026-08-02] Session 21 — Conclave (2nd Firewall) Built, PG-Ordo_Xenos Segment, Ravenor Collector Host, Webway Extended
+
+### Summary
+Completed the independent second-firewall build started in Session 20, with a full rename and restructure. The firewall (formerly `Ordo_Xenos`) was rebuilt from scratch as **`Conclave`**, its segment renamed **`PG-Ordo_Xenos`** on a new dedicated **`vSwitch-inquisition`**, and the OSINT collector VM **`Interrogator_Ravenor`** stood up on it. Discovered the Eero LAN is a `/22` (not a `/24`), forcing a renumber off the originally-planned `192.168.5.0/24`. Fixed Conclave's DNS resolver, resolved an IPv6-induced apt hang on Ravenor, and extended Webway (WireGuard) to reach the new segment remotely — surfacing a `wg set` routing gotcha. All networking for this segment is now complete; the collector software itself is the next phase.
+
+### Naming / Restructure
+- **Hierarchy reworked to mirror the real Inquisition org chart:** `vSwitch-inquisition` (the Inquisition) → `PG-Ordo_Xenos` (a division within it) → VMs (`Conclave` firewall + `Interrogator_Ravenor` collector).
+- **Firewall renamed `Ordo_Xenos` → `Conclave`** — a cross-ordo Inquisitorial authority (governance/defense spanning all ordos), rather than a single-ordo or single-Inquisitor name. Rejected `Eisenhorn` as too character/ordo-specific for the firewall role.
+- **Segment renamed `PG-Inquisition` → `PG-Ordo_Xenos`** — "faction" naming, consistent with the legion-named port groups (Ultramarines, Custodes).
+- Firewall rebuilt fresh rather than renamed in place, since the Session 20 install had failed mid-way and held nothing of value.
+
+### Networking — vSwitch, Port Group, Firewall Rebuild
+- Created a new **internal-only `vSwitch-inquisition`** (no uplink) so the segment shares no ESXi networking object with Rogal's `vSwitch-palace` — a fully parallel, independent stack. The only thing Conclave shares with Rogal is the Eero WAN (the `VM Network` port group on `vSwitch0`), unavoidable on a single physical uplink. Security policy left at defaults (Promiscuous = Reject) — no sniffing planned here.
+- Created **`PG-Ordo_Xenos`** on it, untagged (VLAN 0). Dropped the Session 20 VLAN 10 plan — unnecessary for a dedicated port group and the source of the garbled-console grief.
+- **Conclave VM:** FreeBSD guest, 2 vCPU / 2 GB / 20 GB, two VMXNET3 NICs — `vmx0` (WAN → `VM Network`), `vmx1` (LAN → `PG-Ordo_Xenos`).
+
+### The Install Saga (resolved)
+- Root cause of the Session 20 failures: the VM had **only one NIC, on the internal segment** — no WAN. pfSense's WAN setup had no interface to assign, and the **Netgate Installer downloads pfSense over the internet**, impossible without WAN. Adding the WAN NIC on `VM Network` unblocked everything.
+- `netgate-installer-v1.2` confirmed as the current unified installer (fetches CE or Plus over the net); chose **CE** to match Rogal.
+
+### /22 Discovery + Subnet Renumber
+- **Conclave's WAN pulled `192.168.4.255/22`** from the Eero. The `/22` (`192.168.4.0`–`192.168.7.255`) means the home LAN spans four `/24`s — and **`192.168.5.0/24` (the originally-planned segment) sits *inside* it**, an overlap that would have broken routing and risked DHCP collisions.
+- **Renumbered the segment to `192.168.3.0/24`** — single-digit third octet clear of the Eero `/22` (`4`–`7`), Rogal's `1`/`2`, and the `10.10.10.x` tunnel. Continues the `1, 2, 3` sequence.
+- **Fully static** (per the Session 15 lab-wide static migration): Conclave LAN `192.168.3.1/24`, **DHCP disabled**. Set via console option 2.
+
+### Conclave DNS Resolver Fix
+- `nslookup` from Conclave timed out to `127.0.0.1#53` — Unbound in default root-resolution mode, failing behind the Eero. **Same issue as Rogal in Session 11.**
+- Fixed: Services → DNS Resolver → **Enable Forwarding Mode**; System → General → DNS `8.8.8.8`, `1.1.1.1`. Confirmed resolving. (Conclave's own resolver; Ravenor uses `8.8.8.8` directly and never depended on it.)
+
+### Interrogator_Ravenor — Built
+- Ubuntu Server 24.04, 2 vCPU / 4 GB / 40 GB, single NIC on `PG-Ordo_Xenos`, autostart on.
+- **Static** `192.168.3.10/24`, gw `192.168.3.1`, DNS `8.8.8.8`/`1.1.1.1`, hostname `ravenor`, OpenSSH installed.
+- **apt hung on "Reading package lists…"** during install. Triaged methodically: gateway/NAT/DNS/MTU all confirmed good (incl. full 1500-byte DF ping), mirror test passed. Root cause: **IPv6-first timeout** — `apt` preferring the mirror's IPv6 address with no working IPv6 route (same class flagged for Hive_Secundus in Session 17). `Acquire::ForceIPv4=true` proved it.
+- **Permanent fix:** `/etc/sysctl.d/99-disable-ipv6.conf` (disable_ipv6 all+default) so apt and the collector always use IPv4 across reboots.
+
+### Webway (WireGuard) Extended to the Segment
+- Stood up WireGuard **on Conclave**: package installed; tunnel `Webway`; keys generated; interface/tunnel IP `10.10.10.5/24`; peer = Eye_of_Terror (its pubkey, Elastic IP endpoint, keepalive 25, AllowedIPs `10.10.10.0/24`); `tun_wg0` assigned as an interface with an interface-level static `10.10.10.5/24` (the Session 11 lesson); Pass any/any firewall rule.
+  - UI gotchas: WireGuard package must be installed first; the peer **Endpoint field stays hidden until you uncheck "Dynamic Endpoint."**
+- Added Conclave as a peer on **Eye_of_Terror** (`wg set wg0 peer kq29...NVxM= allowed-ips 10.10.10.5/32,192.168.3.0/24`); handshake confirmed immediately.
+- **KEY LESSON — `wg set` does not add kernel routes.** After the handshake, VS could ping Conclave's tunnel IP (`10.10.10.5`) but nothing in `192.168.3.0/24` (not even `192.168.3.1`). `wg set` configures WireGuard's crypto-routing but installs **no kernel route**, so EoT had no `192.168.3.0/24 → wg0` route and those packets hit its default route and vanished. (`10.10.10.5` worked only because `10.10.10.0/24` is a connected route via wg0.) Fixed with `ip route add 192.168.3.0/24 dev wg0`, then persisted the peer block (`AllowedIPs = 10.10.10.5/32, 192.168.3.0/24`) into EoT's `/etc/wireguard/wg0.conf` so `wg-quick` re-adds the route on every boot.
+- **Confirmed end-to-end:** VS → Eye_of_Terror → Conclave → Ravenor (`192.168.3.10`) all reachable.
+- Enabled SSH on Conclave (System → Advanced → Admin Access → Secure Shell).
+
+### Webway Peer Registry (updated)
+```
+10.10.10.1 = Rogal_Dorn    (routes 192.168.1.0/24, 192.168.2.0/24)
+10.10.10.2 = VS
+10.10.10.3 = Eye_of_Terror (relay, :51820)
+10.10.10.4 = iPhone
+10.10.10.5 = Conclave       (routes 192.168.3.0/24)   [NEW]
+```
+- VS's client AllowedIPs updated to add `192.168.3.0/24`.
+- Public keys kept in local-only notes (not here). Endpoint IPs are dynamic CGNAT source addresses — NOT identity; pubkey + `10.10.10.x` tunnel IP is the durable record.
+
+### Key Lessons Learned
+- **A DHCP lease's prefix tells you the real LAN size.** The Eero is a `/22`, not the assumed `/24`. Check the mask before choosing an "adjacent" subnet — `192.168.5.0/24` looked free but sat inside the home `/22`.
+- **`wg set` ≠ `wg-quick` for routing.** `wg set` handles crypto-routing (AllowedIPs as an ACL/encryption selector) but adds **no kernel routes**. Use `wg-quick` (reads AllowedIPs, installs routes) or add `ip route` entries by hand — and persist the peer in the config so routes return on boot.
+- **`apt` stuck on "Reading package lists…" while all pings/DNS work = IPv6-first timeout.** Disable IPv6 on IPv4-only segments.
+- **pfSense WireGuard's peer "Endpoint" field is hidden behind the "Dynamic Endpoint" checkbox** — uncheck for a fixed relay endpoint.
+- The Netgate Installer needs working WAN internet from the start (it downloads the OS) — a firewall VM with no WAN NIC can't install.
+
+### Open Items / Next
+- [ ] **Build the collector on Ravenor** — Python OSINT pipeline (RSS pull → text extract → content-hash dedupe → dated corpus at `/opt/ravenor`), dedicated `ravenor` service user, systemd timers, and **rclone → Google Drive** so the corpus is reachable by the external (Claude) analysis layer. *(Next phase.)*
+- [ ] **Undo `enableallowallwan` on Conclave** — the WAN was thrown open (allow-all rule + block-private/bogon disabled) to bootstrap GUI access from VS; re-lock it now that Webway gives GUI access at `192.168.3.1`.
+- [ ] **Outbound-only firewall hardening on Conclave** — tighten the LAN "allow any" to just the collector's egress (DNS/HTTPS/NTP); "never accept inbound" is the segment's design intent.
+- [ ] Verify/refresh Rogal's WAN IP on the topology (`192.168.4.248` predates the Session 13 rebuild; may be a stale lease).
+- [ ] Later/deferred: extend Valdor's sniffing to `PG-Ordo_Xenos` (needs a Valdor NIC on `vSwitch-inquisition`); Wazuh agent on Ravenor with FIM exclusions for the data/Drive-mount dirs — not part of the collector's core work-focused scope.
