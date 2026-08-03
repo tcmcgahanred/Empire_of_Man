@@ -2206,3 +2206,41 @@ Completed the independent second-firewall build started in Session 20, with a fu
 - [ ] **Outbound-only firewall hardening on Conclave** — tighten the LAN "allow any" to just the collector's egress (DNS/HTTPS/NTP); "never accept inbound" is the segment's design intent.
 - [ ] Verify/refresh Rogal's WAN IP on the topology (`192.168.4.248` predates the Session 13 rebuild; may be a stale lease).
 - [ ] Later/deferred: extend Valdor's sniffing to `PG-Ordo_Xenos` (needs a Valdor NIC on `vSwitch-inquisition`); Wazuh agent on Ravenor with FIM exclusions for the data/Drive-mount dirs — not part of the collector's core work-focused scope.
+
+### Session 21 (cont.) — Interrogator_Ravenor OSINT Collector Built & Automated
+
+Built the collector pipeline on Ravenor end-to-end and made it autonomous.
+
+**Environment**
+- `/opt/ravenor` with `corpus/`, `logs/`. Note: the intended `--system` `ravenor` user was a no-op (a login user `ravenor` already existed); it's functionally fine — the service runs as that user.
+- Python venv at `/opt/ravenor/venv` with `feedparser` + `trafilatura`. Built as root then `chown -R ravenor` to dodge a `sudo -u` HOME/permission snag.
+
+**Feed list — editable by design**
+- `/opt/ravenor/feeds.txt`: plain text, one URL per line, `#` comments. Owned by the login user so feeds can be added with no sudo, from any SSH session (incl. phone): `echo "https://…" >> /opt/ravenor/feeds.txt`.
+- Seeded curated set: Krebs, BleepingComputer, The Hacker News, SANS ISC, Schneier, Project Zero. "Curated + yours" — add your own anytime.
+
+**collector.py** (`/opt/ravenor/collector.py`)
+- Reads feeds.txt; **auto-detects** RSS/Atom feed vs single article page (drop any URL and it works).
+- Extracts full article text via `trafilatura` (falls back to feed summary).
+- **Dedup by URL hash** in `seen.txt` — an article is stored once, ever, across daily runs.
+- Writes per-article JSON to `corpus/YYYY-MM-DD/`. First run: **105 articles**.
+
+**rclone → Google Drive**
+- Installed rclone (apt, 1.60.1); configured remote **`gdrive`** (OAuth, scope full drive).
+- Headless auth was the painful part: the interactive `rclone config` died twice to SSH drops (Webway/SSH resets) — **fixed by running it inside `tmux`**. The remote saved without a token until `rclone config reconnect gdrive:` → answer **No** to auto-config → run `rclone authorize "drive" "<state>"` on **VS** (browser) → paste token back on Ravenor.
+- Corpus synced: `rclone copy /opt/ravenor/corpus gdrive:ravenor-corpus` — **105 files confirmed in Drive**.
+
+**Automation (systemd)**
+- `/opt/ravenor/run.sh` = collector + `rclone copy`.
+- `ravenor.service` (Type=oneshot, `User=ravenor`, ExecStart=run.sh) + `ravenor.timer` (`OnCalendar=daily`, `Persistent=true`, `RandomizedDelaySec=300`).
+- Confirmed a clean run **under systemd** (status 0/SUCCESS) — proves rclone finds its config when run as `ravenor` by systemd. **Ravenor now collects + pushes to Drive daily, unattended.**
+
+**Conclave WAN re-locked**
+- Undid the `enableallowallwan` bootstrap: re-enabled Block private networks + Block bogon on WAN, deleted the "Allow all ipv4+ipv6 via pfSsh.php" rule. Conclave GUI now reachable only via Webway at `https://192.168.3.1`.
+
+**Lessons**
+- rclone's Google Drive OAuth is painful on a headless box — run interactive `rclone config` inside `tmux` so SSH drops don't kill it, or do the browser auth on another machine and copy the config over.
+- `rclone config reconnect <remote>:` re-does *just* the token for an existing remote (don't recreate it).
+- `wg`/SSH over the Webway tunnel can drop mid-session — `tmux` for anything long/interactive on Ravenor.
+
+**Status:** collector fully operational and autonomous. Remaining: build the consumption side — Claude reading `gdrive:ravenor-corpus` weekly to synthesize the CTI brief.
