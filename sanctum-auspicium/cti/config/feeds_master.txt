@@ -1,0 +1,233 @@
+# ================================================================
+# RAVENOR feeds.txt — MASTER EXPANSION SET
+# Generated 2026-08-04 for /opt/ravenor/feeds.txt
+# ================================================================
+#
+# HOW TO USE THIS FILE
+#   Append in load-order blocks below. Each URL carries a confidence
+#   flag in its comment:
+#     [VERIFIED]  = current endpoint confirmed via live-polled source
+#                   (ThreatFilter directory) or Google News format
+#                   confirmed working July 2026
+#     [OPML]      = from your Feedly export; likely-current but not
+#                   independently re-verified
+#     [CHECK]     = path uncertain / publisher certain but feed URL not
+#                   confirmed — TEST on Ravenor before trusting
+#     [SCRAPE?]   = probably not RSS (web portal) — may need a scraper,
+#                   not a feed line
+#
+# VERIFY-ON-RAVENOR ONE-LINER (run before trusting any [CHECK] line):
+#   while read -r u; do case "$u" in ""|\#*) continue;; esac; \
+#     printf '%s  ' "$(curl -sS -o /dev/null -w '%{http_code}' \
+#     -A 'Mozilla/5.0' --max-time 15 "$u")"; echo "$u"; done < THISFILE
+#   Anything not 200 -> investigate before it goes in the live feeds.txt.
+#
+# ================================================================
+# !!! TWO LOAD-BEARING KNOWN ISSUES — READ FIRST !!!
+# ================================================================
+#
+# (1) TITLE-DEDUP UPGRADE IS NOW REQUIRED, NOT OPTIONAL.
+#     This set adds ~46 Google News query feeds (AOR layers). Google
+#     News links are REDIRECT TOKENS, not publisher URLs. Ravenor's
+#     collector dedups by URL HASH -> the same story caught by multiple
+#     GNews queries produces DIFFERENT tokens -> ALL survive dedup ->
+#     duplicate corpus entries. At 46 overlapping queries this floods
+#     the corpus. FIX BEFORE LOADING THE AOR LAYERS: add title-based
+#     (fuzzy) dedup to collector.py alongside the existing URL-hash pass.
+#
+# (2) SOME PUBLISHERS 403 SERVER/DATACENTER EGRESS.
+#     BleepingComputer (a current working source) and others return 403
+#     to non-residential IPs. Ravenor is on-prem behind Conclave, so it
+#     MAY be fine — but if a [VERIFIED] news feed returns 403 on the
+#     one-liner above, this is why. Not a bad URL; an egress block.
+#
+# ================================================================
+# EDITORIAL NOTE (for the synthesis/analyst stage, not collection)
+# ================================================================
+#   ONE EVENT = ONE ENTRY. A single incident often has both a "news"
+#   angle and a "TTP" angle (e.g., the DPRK / Sapphire Sleet npm
+#   supply-chain story appeared TWICE in an early staging draft — once
+#   in News, once in CTA TTPs, same sources). Place each event in the
+#   section matching its dominant value and fold the secondary angle
+#   into that single entry. Do not run the same event in two sections.
+#
+#
+# ================================================================
+# BLOCK A — NATIONAL: GOVERNMENT / CERT / SLTT-SPECIFIC  (load first)
+# ================================================================
+https://www.cisa.gov/cybersecurity-advisories/all.xml          # [VERIFIED] CISA advisories (alerts, ICS, medical)
+https://us-cert.cisa.gov/ncas/current-activity.xml             # [VERIFIED] CISA Current Activity
+https://www.cisecurity.org/feed/advisories                     # [CHECK] MS-ISAC advisories — THE SLTT feed; from OPML, publisher certain
+https://www.kb.cert.org/vulfeed                                # [CHECK] CERT/CC Vulnerability Notes; from OPML
+
+# ================================================================
+# BLOCK B — NATIONAL: VENDOR PSIRTs (SLTT-common infrastructure)
+# ================================================================
+https://www.fortiguard.com/rss/ir.xml                          # [VERIFIED] Fortinet PSIRT (frequent in KEV)
+https://sec.cloudapps.cisco.com/security/center/psirtrss20/CiscoSecurityAdvisory.xml  # [VERIFIED] Cisco PSIRT
+https://security.paloaltonetworks.com/rss.xml                  # [VERIFIED] Palo Alto PSIRT
+https://api.msrc.microsoft.com/update-guide/rss                # [VERIFIED] Microsoft MSRC
+
+# ================================================================
+# BLOCK C — NATIONAL: EXPLOITATION EVIDENCE (feeds PIR-3 / convergence)
+# ================================================================
+https://www.greynoise.io/blog/rss.xml                          # [VERIFIED] GreyNoise — is a CVE actively sprayed
+https://www.rapid7.com/blog/rss/                               # [VERIFIED] Rapid7 — exploitability framing
+https://www.zerodayinitiative.com/rss/published/               # [VERIFIED] ZDI published advisories
+
+# ================================================================
+# BLOCK D — NATIONAL: NEWS / RESEARCH (corrected current endpoints)
+# ================================================================
+https://therecord.media/feed/                                  # [VERIFIED] The Record (Recorded Future newsroom)
+https://blog.talosintelligence.com/rss/                        # [VERIFIED] Cisco Talos (corrected from dead blogspot)
+https://unit42.paloaltonetworks.com/feed/                      # [VERIFIED] Unit 42 (corrected from old researchcenter)
+https://feeds.feedburner.com/TheHackersNews                    # [VERIFIED] The Hacker News (publisher FeedBurner)
+https://isc.sans.edu/rssfeed_full.xml                          # [VERIFIED] SANS ISC FULL-TEXT (fixes nav-only problem)
+https://www.schneier.com/feed/atom/                            # [VERIFIED] Schneier (canonical Atom)
+https://www.darkreading.com/rss.xml                            # [VERIFIED] Dark Reading (replaces both stale OPML variants)
+https://securelist.com/feed/                                   # [VERIFIED] Securelist/Kaspersky (check org policy on Kaspersky)
+https://news.sophos.com/en-us/category/threat-research/feed/   # [VERIFIED] Sophos threat-research only
+https://www.crowdstrike.com/blog/feed/                         # [VERIFIED] CrowdStrike (corrected)
+https://www.microsoft.com/en-us/security/blog/feed/            # [VERIFIED] Microsoft Security Blog (corrected from technet)
+
+# ================================================================
+# BLOCK E — NATIONAL: SECONDARY (from OPML; add & watch error log)
+# ================================================================
+https://www.recordedfuture.com/feed/                           # [OPML] Recorded Future blog (distinct from The Record)
+https://www.tenable.com/blog/feed                              # [CHECK] Tenable (corrected from old blog.tenablesecurity)
+https://feeds.feedburner.com/hackread                          # [OPML] Hackread
+https://feeds.feedburner.com/TroyHunt                          # [OPML] Troy Hunt
+https://www.infosecurity-magazine.com/rss/news/               # [OPML] Infosecurity Magazine
+https://thecyberwire.com/feeds/rss.xml                         # [OPML] The CyberWire
+https://www.nist.gov/blogs/cybersecurity-insights/rss.xml      # [OPML] NIST Cybersecurity Insights
+https://jvn.jp/en/rss/jvn.rdf                                  # [OPML] JVN (Japan vuln notes)
+https://seclists.org/rss/fulldisclosure.rss                    # [OPML] Full Disclosure list
+https://securityintelligence.com/feed/                         # [OPML] IBM Security Intelligence
+https://cybersecuritynews.com/feed/                            # [OPML] Cyber Security News
+https://bartblaze.blogspot.com/feeds/posts/default             # [OPML] Blaze's Security Blog
+https://haveibeenpwned.com/latestbreaches/rss                  # [CHECK] HIBP breaches — path uncertain
+https://packetstormsecurity.com/feeds/news/                    # [CHECK] Packet Storm — path uncertain
+https://blog.qualys.com/feed                                   # [CHECK] Qualys blog (community URL moved)
+
+# ================================================================
+# BLOCK F — NATIONAL: STALE IN OPML — FIND CURRENT URL BEFORE ADDING
+# (publisher certain, feed path dead/moved — do NOT paste as-is)
+# ================================================================
+# [CHECK] Trellix (was McAfee Labs) — find current Trellix research feed
+# [CHECK] NETSCOUT ASERT — old asert.arbornetworks.com dead; find netscout.com research feed
+# [CHECK] Trend Micro — both OPML feedburner variants likely stale
+# [CHECK] Mandiant — OPML entry was a BrightTALK webinar feed; use Google Cloud TI:
+#         https://cloudblog.withgoogle.com/topics/threat-intelligence/rss/  (verify)
+# [CHECK] ThreatConnect — verify current blog feed
+# [CHECK] CXSecurity/ExploitAlert — verify still live
+# [CHECK] r/netsec — https://api.reddit.com/subreddit/netsec — Reddit API now auth-gated, may fail
+#
+# INTENTIONALLY OMITTED (low SLTT signal): Gizmodo security tag,
+# CySecurity blogspot, Cyber Defense Magazine, securitymagazine,
+# Google News "cybersecurity" generic query. Add back if you disagree.
+#
+#
+# ================================================================
+# BLOCK G — CCIC AOR: STATEWIDE GEOGRAPHIC QUERIES
+# *** Google News. Load AFTER the title-dedup collector fix. ***
+# All [VERIFIED] format; low-volume / high-weight (tier 1 = 8.0).
+# ================================================================
+https://news.google.com/rss/search?q=%22California%22%20(ransomware%20OR%20%22data%20breach%22%20OR%20cyberattack)&hl=en-US&gl=US&ceid=US:en    # [VERIFIED] CA general
+https://news.google.com/rss/search?q=California%20(city%20OR%20county)%20(ransomware%20OR%20cyberattack%20OR%20%22data%20breach%22)&hl=en-US&gl=US&ceid=US:en    # [VERIFIED] CA local gov
+https://news.google.com/rss/search?q=California%20%22school%20district%22%20(ransomware%20OR%20cyberattack%20OR%20%22data%20breach%22)&hl=en-US&gl=US&ceid=US:en    # [VERIFIED] CA K-12
+https://news.google.com/rss/search?q=California%20(water%20OR%20wastewater%20OR%20utility)%20(cyberattack%20OR%20hack%20OR%20breach)&hl=en-US&gl=US&ceid=US:en    # [VERIFIED] CA water/utility
+https://news.google.com/rss/search?q=California%20(hospital%20OR%20health%20OR%20clinic)%20(ransomware%20OR%20%22data%20breach%22)&hl=en-US&gl=US&ceid=US:en    # [VERIFIED] CA health
+https://news.google.com/rss/search?q=California%20government%20(ransomware%20OR%20cyberattack)&hl=en-US&gl=US&ceid=US:en    # [VERIFIED] CA government
+https://news.google.com/rss/search?q=California%20tribal%20(casino%20OR%20nation%20OR%20government)%20(ransomware%20OR%20cyberattack%20OR%20breach)&hl=en-US&gl=US&ceid=US:en    # [VERIFIED] CA tribal
+
+# ================================================================
+# BLOCK H — CCIC AOR: SECTOR-GRANULAR QUERIES (statewide)
+# ================================================================
+https://news.google.com/rss/search?q=California%20(%22special%20district%22%20OR%20%22transit%20agency%22%20OR%20%22public%20works%22)%20(cyberattack%20OR%20ransomware%20OR%20breach)&hl=en-US&gl=US&ceid=US:en    # [VERIFIED] special districts/transit
+https://news.google.com/rss/search?q=California%20(%22community%20college%22%20OR%20university%20OR%20CSU%20OR%20UC)%20(ransomware%20OR%20%22data%20breach%22)&hl=en-US&gl=US&ceid=US:en    # [VERIFIED] higher ed
+https://news.google.com/rss/search?q=California%20(court%20OR%20%22superior%20court%22%20OR%20sheriff%20OR%20%22police%20department%22)%20(ransomware%20OR%20cyberattack%20OR%20breach)&hl=en-US&gl=US&ceid=US:en    # [VERIFIED] courts/law enforcement
+https://news.google.com/rss/search?q=California%20(election%20OR%20%22registrar%20of%20voters%22)%20(cyberattack%20OR%20breach%20OR%20hack)&hl=en-US&gl=US&ceid=US:en    # [VERIFIED] elections
+
+# ================================================================
+# BLOCK I — CCIC AOR: OFFICIAL / REGIONAL CA SOURCES
+# ================================================================
+# [SCRAPE?] CA DOJ/AG data-breach notification list — PRIMARY registry of
+#   orgs reporting breaches affecting Californians. Web portal, likely NOT
+#   RSS. HIGH VALUE if ingestible. Portal (NOT a feed URL):
+#   https://oag.ca.gov/privacy/databreach/list
+https://news.caloes.ca.gov/feed/                               # [CHECK] Cal OES news — verify feed path
+https://news.google.com/rss/search?q=(%22CISA%20Region%209%22%20OR%20%22CISA%20California%22)&hl=en-US&gl=US&ceid=US:en    # [VERIFIED] CISA Region 9 via GNews proxy
+
+
+# ================================================================
+# BLOCK J — CCIC AOR: 34 COUNTY QUERIES (confirmed AOR boundary)
+# All [VERIFIED] format. Exact-phrase + California qualifier.
+# ================================================================
+# Alpine County
+https://news.google.com/rss/search?q=%22Alpine%20County%22%20California%20%28ransomware%20OR%20cyberattack%20OR%20%22data%20breach%22%20OR%20hack%29&hl=en-US&gl=US&ceid=US:en
+# Amador County
+https://news.google.com/rss/search?q=%22Amador%20County%22%20California%20%28ransomware%20OR%20cyberattack%20OR%20%22data%20breach%22%20OR%20hack%29&hl=en-US&gl=US&ceid=US:en
+# Butte County
+https://news.google.com/rss/search?q=%22Butte%20County%22%20California%20%28ransomware%20OR%20cyberattack%20OR%20%22data%20breach%22%20OR%20hack%29&hl=en-US&gl=US&ceid=US:en
+# Calaveras County
+https://news.google.com/rss/search?q=%22Calaveras%20County%22%20California%20%28ransomware%20OR%20cyberattack%20OR%20%22data%20breach%22%20OR%20hack%29&hl=en-US&gl=US&ceid=US:en
+# Colusa County
+https://news.google.com/rss/search?q=%22Colusa%20County%22%20California%20%28ransomware%20OR%20cyberattack%20OR%20%22data%20breach%22%20OR%20hack%29&hl=en-US&gl=US&ceid=US:en
+# El Dorado County
+https://news.google.com/rss/search?q=%22El%20Dorado%20County%22%20California%20%28ransomware%20OR%20cyberattack%20OR%20%22data%20breach%22%20OR%20hack%29&hl=en-US&gl=US&ceid=US:en
+# Fresno County
+https://news.google.com/rss/search?q=%22Fresno%20County%22%20California%20%28ransomware%20OR%20cyberattack%20OR%20%22data%20breach%22%20OR%20hack%29&hl=en-US&gl=US&ceid=US:en
+# Glenn County
+https://news.google.com/rss/search?q=%22Glenn%20County%22%20California%20%28ransomware%20OR%20cyberattack%20OR%20%22data%20breach%22%20OR%20hack%29&hl=en-US&gl=US&ceid=US:en
+# Inyo County
+https://news.google.com/rss/search?q=%22Inyo%20County%22%20California%20%28ransomware%20OR%20cyberattack%20OR%20%22data%20breach%22%20OR%20hack%29&hl=en-US&gl=US&ceid=US:en
+# Kern County
+https://news.google.com/rss/search?q=%22Kern%20County%22%20California%20%28ransomware%20OR%20cyberattack%20OR%20%22data%20breach%22%20OR%20hack%29&hl=en-US&gl=US&ceid=US:en
+# Kings County
+https://news.google.com/rss/search?q=%22Kings%20County%22%20California%20%28ransomware%20OR%20cyberattack%20OR%20%22data%20breach%22%20OR%20hack%29&hl=en-US&gl=US&ceid=US:en
+# Lake County
+https://news.google.com/rss/search?q=%22Lake%20County%22%20California%20%28ransomware%20OR%20cyberattack%20OR%20%22data%20breach%22%20OR%20hack%29&hl=en-US&gl=US&ceid=US:en
+# Lassen County
+https://news.google.com/rss/search?q=%22Lassen%20County%22%20California%20%28ransomware%20OR%20cyberattack%20OR%20%22data%20breach%22%20OR%20hack%29&hl=en-US&gl=US&ceid=US:en
+# Madera County
+https://news.google.com/rss/search?q=%22Madera%20County%22%20California%20%28ransomware%20OR%20cyberattack%20OR%20%22data%20breach%22%20OR%20hack%29&hl=en-US&gl=US&ceid=US:en
+# Mariposa County
+https://news.google.com/rss/search?q=%22Mariposa%20County%22%20California%20%28ransomware%20OR%20cyberattack%20OR%20%22data%20breach%22%20OR%20hack%29&hl=en-US&gl=US&ceid=US:en
+# Mendocino County
+https://news.google.com/rss/search?q=%22Mendocino%20County%22%20California%20%28ransomware%20OR%20cyberattack%20OR%20%22data%20breach%22%20OR%20hack%29&hl=en-US&gl=US&ceid=US:en
+# Merced County
+https://news.google.com/rss/search?q=%22Merced%20County%22%20California%20%28ransomware%20OR%20cyberattack%20OR%20%22data%20breach%22%20OR%20hack%29&hl=en-US&gl=US&ceid=US:en
+# Modoc County
+https://news.google.com/rss/search?q=%22Modoc%20County%22%20California%20%28ransomware%20OR%20cyberattack%20OR%20%22data%20breach%22%20OR%20hack%29&hl=en-US&gl=US&ceid=US:en
+# Mono County
+https://news.google.com/rss/search?q=%22Mono%20County%22%20California%20%28ransomware%20OR%20cyberattack%20OR%20%22data%20breach%22%20OR%20hack%29&hl=en-US&gl=US&ceid=US:en
+# Nevada County
+https://news.google.com/rss/search?q=%22Nevada%20County%22%20California%20%28ransomware%20OR%20cyberattack%20OR%20%22data%20breach%22%20OR%20hack%29&hl=en-US&gl=US&ceid=US:en
+# Placer County
+https://news.google.com/rss/search?q=%22Placer%20County%22%20California%20%28ransomware%20OR%20cyberattack%20OR%20%22data%20breach%22%20OR%20hack%29&hl=en-US&gl=US&ceid=US:en
+# Plumas County
+https://news.google.com/rss/search?q=%22Plumas%20County%22%20California%20%28ransomware%20OR%20cyberattack%20OR%20%22data%20breach%22%20OR%20hack%29&hl=en-US&gl=US&ceid=US:en
+# Sacramento County
+https://news.google.com/rss/search?q=%22Sacramento%20County%22%20California%20%28ransomware%20OR%20cyberattack%20OR%20%22data%20breach%22%20OR%20hack%29&hl=en-US&gl=US&ceid=US:en
+# San Joaquin County
+https://news.google.com/rss/search?q=%22San%20Joaquin%20County%22%20California%20%28ransomware%20OR%20cyberattack%20OR%20%22data%20breach%22%20OR%20hack%29&hl=en-US&gl=US&ceid=US:en
+# Shasta County
+https://news.google.com/rss/search?q=%22Shasta%20County%22%20California%20%28ransomware%20OR%20cyberattack%20OR%20%22data%20breach%22%20OR%20hack%29&hl=en-US&gl=US&ceid=US:en
+# Sierra County
+https://news.google.com/rss/search?q=%22Sierra%20County%22%20California%20%28ransomware%20OR%20cyberattack%20OR%20%22data%20breach%22%20OR%20hack%29&hl=en-US&gl=US&ceid=US:en
+# Stanislaus County
+https://news.google.com/rss/search?q=%22Stanislaus%20County%22%20California%20%28ransomware%20OR%20cyberattack%20OR%20%22data%20breach%22%20OR%20hack%29&hl=en-US&gl=US&ceid=US:en
+# Sutter County
+https://news.google.com/rss/search?q=%22Sutter%20County%22%20California%20%28ransomware%20OR%20cyberattack%20OR%20%22data%20breach%22%20OR%20hack%29&hl=en-US&gl=US&ceid=US:en
+# Tehama County
+https://news.google.com/rss/search?q=%22Tehama%20County%22%20California%20%28ransomware%20OR%20cyberattack%20OR%20%22data%20breach%22%20OR%20hack%29&hl=en-US&gl=US&ceid=US:en
+# Trinity County
+https://news.google.com/rss/search?q=%22Trinity%20County%22%20California%20%28ransomware%20OR%20cyberattack%20OR%20%22data%20breach%22%20OR%20hack%29&hl=en-US&gl=US&ceid=US:en
+# Tulare County
+https://news.google.com/rss/search?q=%22Tulare%20County%22%20California%20%28ransomware%20OR%20cyberattack%20OR%20%22data%20breach%22%20OR%20hack%29&hl=en-US&gl=US&ceid=US:en
+# Tuolumne County
+https://news.google.com/rss/search?q=%22Tuolumne%20County%22%20California%20%28ransomware%20OR%20cyberattack%20OR%20%22data%20breach%22%20OR%20hack%29&hl=en-US&gl=US&ceid=US:en
+# Yolo County
+https://news.google.com/rss/search?q=%22Yolo%20County%22%20California%20%28ransomware%20OR%20cyberattack%20OR%20%22data%20breach%22%20OR%20hack%29&hl=en-US&gl=US&ceid=US:en
+# Yuba County
+https://news.google.com/rss/search?q=%22Yuba%20County%22%20California%20%28ransomware%20OR%20cyberattack%20OR%20%22data%20breach%22%20OR%20hack%29&hl=en-US&gl=US&ceid=US:en
