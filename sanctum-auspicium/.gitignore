@@ -1,0 +1,13 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# rclone / secrets — never commit tokens or credentials
+rclone.conf
+*.token
+.env
+
+# OS
+.DS_Store
