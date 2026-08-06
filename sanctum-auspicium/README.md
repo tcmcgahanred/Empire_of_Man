@@ -6,7 +6,7 @@ The *seat of detection* — a personal, open-source intelligence apparatus and a
 
 **Effort 1 — CTI (built, operational).** A weekly OSINT cyber threat intelligence cycle supporting a California Cybersecurity Integration Center (CCIC) role. Produces a weekly brief for low-maturity State/Local/Tribal/Territorial (SLTT) partners across a 34-county California Area of Responsibility. Product is **TLP:CLEAR** (freely shareable).
 
-**Effort 2 — S2 (future, not built).** A weekly intelligence cycle supporting a California Army National Guard S2 (intelligence officer) role at an Aviation Brigade. Shares the machinery (collection patterns, scoring discipline, human-gate philosophy) but keeps its own doctrine — IPB frameworks: MCOO, OAKOC, METT-TC, ASCOPE, PMESII-PT. All work **unclassified / open-source**.
+**Effort 2 — S2 (future, not built).** A weekly intelligence cycle supporting a [REDACTED]. Shares the machinery (collection patterns, scoring discipline, human-gate philosophy) but keeps its own doctrine — IPB frameworks: MCOO, OAKOC, METT-TC, ASCOPE, PMESII-PT. All work **unclassified / open-source**.
 
 ## Naming scheme (Inquisition / Ordo theme)
 
