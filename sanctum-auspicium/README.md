@@ -6,7 +6,7 @@ The *seat of detection* — a personal, open-source intelligence apparatus and a
 
 **Effort 1 — CTI (built, operational).** A weekly OSINT cyber threat intelligence cycle supporting a California Cybersecurity Integration Center (CCIC) role. Produces a weekly brief for low-maturity State/Local/Tribal/Territorial (SLTT) partners across a 34-county California Area of Responsibility. Product is **TLP:CLEAR** (freely shareable).
 
-**Effort 2 — S2 (future, not built).** A weekly intelligence cycle supporting a [Redacted]. Shares the machinery (collection patterns, scoring discipline, human-gate philosophy) but keeps its own doctrine — IPB frameworks: MCOO, OAKOC, METT-TC, ASCOPE, PMESII-PT. All work **unclassified / open-source**.
+**Effort 2 — S2 (future, not built).** A weekly intelligence cycle supporting a California Army National Guard S2 (intelligence officer) role at an Aviation Brigade. Shares the machinery (collection patterns, scoring discipline, human-gate philosophy) but keeps its own doctrine — IPB frameworks: MCOO, OAKOC, METT-TC, ASCOPE, PMESII-PT. All work **unclassified / open-source**.
 
 ## Naming scheme (Inquisition / Ordo theme)
 
@@ -43,9 +43,26 @@ Governed by the **Codex**. Tracked by the **Cogitator**. Synthesis is **manual**
 
 Python (feedparser, trafilatura, rclone), systemd, Google Drive corpus, draw.io tracker. Runs on the **Interrogator_Ravenor** VM in the EoM lab (PG-Ordo_Xenos, `192.168.3.10`).
 
-## Status
+## Version control & sync
 
-Collection operational (autonomous daily on Ravenor). Pre-filter (Arbites) built and tuned. Synthesis manual. Distribution/TLP:CLEAR presentation layer not yet built.
+**Git is the source of truth** (see `VERSIONING.md`). Topology: a **private GitHub repo is the authoritative remote**; **Ravenor** is the working copy that runs Acolyte/Arbites, and **VS** is a second working copy for authoring. Both push/pull against GitHub — so history survives any lab attack-exercise, snapshot, or VM rebuild (a Ravenor-only repo would die with the VM).
+
+Everyday loop:
+
+```
+# VS — after editing code:
+git add -A && git commit -m "what changed" && git push
+# Ravenor — to receive:
+git pull
+```
+
+Conflict-avoidance discipline: **author code (Acolyte/Arbites) on VS**, edit **Ravenor-specific config (`feeds.txt`) on Ravenor**. Keeping code and live-config edits in separate places prevents VS↔Ravenor merge conflicts; if both must touch a file, always `git pull` first.
+
+Egress caveat: Ravenor reached GitHub-class hosts fine during feed verification, so push/pull should work from the isolated segment — confirm on first push (verify-before-trust). If Ravenor egress is later locked down, pushes may break.
+
+## Credentials (day-one rule)
+
+Secrets **never** enter the repo — they live in Keeper. The `.gitignore` blocks the usual carriers before the first commit: `rclone.conf` (Drive tokens), API keys/tokens, service-account JSON, `.env`, and runtime data (`corpus/`, `seen.txt`, `seen_titles.txt`). `feeds.txt` (public URLs) is safe to commit. **Scrub the Eye_of_Terror / WireGuard relay IP** from any committed config — sensitive infra detail flagged for redaction (a `.gitignore` can't catch an inline IP; keep it out by hand).
 
 ## Repo layout
 
@@ -54,13 +71,14 @@ sanctum-auspicium/
 ├── README.md
 ├── CHANGELOG.md             # curated highlights (git log = full record)
 ├── VERSIONING.md            # git-as-truth; artifact version anchors
+├── .gitignore               # blocks secrets + runtime data
 ├── cti/                     # Effort 1 — CCIC SLTT cyber
-│   ├── acolyte.py           # collector          (import from Sanctum chat)
+│   ├── acolyte.py           # collector           (import from Sanctum chat)
 │   ├── arbites.py           # pre-filter / scorer (import from Sanctum chat)
 │   ├── codex.md             # intelligence requirements & doctrine (import)
 │   ├── cogitator.drawio     # intel-cycle tracker (import)
 │   ├── config/
-│   │   ├── feeds.txt                 # live feed list (lives on Ravenor)
+│   │   ├── feeds.txt                 # live feed list (mirrors Ravenor)
 │   │   └── trusted_sources_AOR.txt   # curated AOR sources (pending verify)
 │   ├── editions/
 │   │   └── vox_v20260810.md          # brief editions, publish-date keyed (import)

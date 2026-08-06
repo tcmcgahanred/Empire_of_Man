@@ -4,10 +4,26 @@ __pycache__/
 .venv/
 venv/
 
-# rclone / secrets — never commit tokens or credentials
-rclone.conf
+# Credentials & secrets — NEVER commit (secrets live in Keeper, not the repo)
+rclone.conf            # holds Google Drive tokens
 *.token
+*.key
+*.pem
 .env
+*service-account*.json  # Drive/GCP service-account key files
+credentials.json
+client_secret*.json
+
+# Runtime data — not source
+corpus/
+seen.txt
+seen_titles.txt
+*.log
 
 # OS
 .DS_Store
+
+# NOTE: feeds.txt (public URLs) IS safe to commit.
+# NOTE: scrub the Eye_of_Terror / WireGuard relay IP from any file before committing —
+#       it is sensitive infra detail, flagged for redaction. .gitignore can't catch an
+#       inline IP; keep it out of committed config by hand.

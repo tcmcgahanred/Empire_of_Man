@@ -13,9 +13,10 @@ Sub-project established under Empire of Man. First substantive entry captures th
 - **Pre-filter (Arbites) built and tuned over 4 passes** on the real corpus — fixed keyword collisions (substring matches like "cisco" inside "Francisco"), tightened tier-1 to require California *as subject* of an incident (not passing mention), added empty-title guard. Reliably surfaces genuine California SLTT incidents at the top.
 - **Staging brief edition v20260810 produced** from clean corpus (water/wastewater OT sector lead).
 - **External review (Gemini) incorporated** — accepted: upstream pre-filter, ransomware-leak-site AOR sensor idea, cross-section dedup, primary-source elevation. Rejected: additive scoring rewrite (would reverse the deliberate convergence design).
+- **Version control decided** — Git as source of truth; private GitHub remote authoritative; VS + Ravenor both working copies; secrets stay in Keeper, blocked by `.gitignore`.
 
 ### Open / next
-- Rename artifacts to the Sanctum scheme (Acolyte / Arbites / Codex / Vox / Cogitator).
+- Import artifacts into the tree under the Sanctum scheme (Acolyte / Arbites / Codex / Vox / Cogitator) with version-anchor headers.
 - Verify + load curated AOR trusted sources (MS-ISAC, Cal OES, CDT, CA regional press).
 - Build CA AG breach-registry scraper (authoritative AOR breach sensor; not RSS).
 - Add ransomware-leak-site aggregator filtered for California (early-warning AOR sensor).
