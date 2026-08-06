@@ -1,0 +1,197 @@
+<mxfile host="app.diagrams.net">
+  <diagram name="CCIC WCTI Intelligence Cycle" id="ccic-wcti-cycle-1">
+    <mxGraphModel dx="1400" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="2800" pageHeight="1400" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <mxCell id="title" parent="1" vertex="1" style="text;html=1;align=left;fontSize=22;fontStyle=1;verticalAlign=middle;" value="CCIC Weekly Cyber Threat Intelligence — Pipeline &amp; Intelligence Cycle Tracker">
+          <mxGeometry x="60" y="30" width="1400" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="subtitle" parent="1" vertex="1" style="text;html=1;align=left;fontSize=13;fontColor=#5F5E5A;verticalAlign=middle;" value="Solo OSINT-only CTI pipeline: Ravenor collector → Google Drive corpus → Claude synthesis → staging draft → distribution template → SLTT audience. Each stage: inputs, outputs, touchpoints (where you adjust it), technologies, status.">
+          <mxGeometry x="60" y="70" width="1900" height="24" as="geometry" />
+        </mxCell>
+
+        <!-- STAGE 1: PLANNING -->
+        <mxCell id="s1_head" parent="1" vertex="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E6F1FB;strokeColor=#185FA5;fontStyle=1;fontSize=14;verticalAlign=middle;" value="1. PLANNING &amp; DIRECTION">
+          <mxGeometry x="60" y="130" width="330" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="s1_in" parent="1" vertex="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#185FA5;align=left;spacingLeft=8;verticalAlign=top;spacingTop=6;fontSize=11;" value="&lt;b&gt;INPUTS&lt;/b&gt;&#xa;• CCIC AOR mission (CA SLTT)&#xa;• Analyst intent / leadership need&#xa;• Prior-edition feedback">
+          <mxGeometry x="60" y="185" width="330" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="s1_out" parent="1" vertex="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#185FA5;align=left;spacingLeft=8;verticalAlign=top;spacingTop=6;fontSize=11;" value="&lt;b&gt;OUTPUTS&lt;/b&gt;&#xa;• KIQ (broad, collection-governing)&#xa;• PIR-1..4 (priority requirements)&#xa;• Multiplicative scoring model">
+          <mxGeometry x="60" y="280" width="330" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="s1_tp" parent="1" vertex="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFF7E6;strokeColor=#C9820A;align=left;spacingLeft=8;verticalAlign=top;spacingTop=6;fontSize=11;" value="&lt;b&gt;TOUCHPOINT (adjust here)&lt;/b&gt;&#xa;CCIC_WCTI_intelligence_requirements.md&#xa;— edit PIRs, tier weights (8/4/2/1),&#xa;elevation multipliers, surge PIRs">
+          <mxGeometry x="60" y="375" width="330" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="s1_tech" parent="1" vertex="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#F1EFE8;strokeColor=#888780;align=left;spacingLeft=8;verticalAlign=top;spacingTop=6;fontSize=11;" value="&lt;b&gt;TECHNOLOGIES&lt;/b&gt;&#xa;• Markdown IR artifact&#xa;• IPB frameworks (as relevant)&#xa;• Threat convergence model (I×O×C)">
+          <mxGeometry x="60" y="470" width="330" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="s1_status" parent="1" vertex="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E1F5EE;strokeColor=#0F6E56;align=left;spacingLeft=8;verticalAlign=middle;fontSize=11;fontStyle=1;" value="STATUS: ✔ COMPLETE — KIQ/PIRs + scoring settled">
+          <mxGeometry x="60" y="555" width="330" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- STAGE 2: COLLECTION -->
+        <mxCell id="s2_head" parent="1" vertex="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E6F1FB;strokeColor=#185FA5;fontStyle=1;fontSize=14;verticalAlign=middle;" value="2. COLLECTION">
+          <mxGeometry x="420" y="130" width="330" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="s2_in" parent="1" vertex="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#185FA5;align=left;spacingLeft=8;verticalAlign=top;spacingTop=6;fontSize=11;" value="&lt;b&gt;INPUTS&lt;/b&gt;&#xa;• KIQ (wide-net posture)&#xa;• Curated OSINT feed list&#xa;• Fri–Thu collection window">
+          <mxGeometry x="420" y="185" width="330" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="s2_out" parent="1" vertex="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#185FA5;align=left;spacingLeft=8;verticalAlign=top;spacingTop=6;fontSize=11;" value="&lt;b&gt;OUTPUTS&lt;/b&gt;&#xa;• Raw article JSON (full text)&#xa;• Dated corpus: corpus/YYYY-MM-DD/&#xa;• Pushed to gdrive:ravenor-corpus">
+          <mxGeometry x="420" y="280" width="330" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="s2_tp" parent="1" vertex="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFF7E6;strokeColor=#C9820A;align=left;spacingLeft=8;verticalAlign=top;spacingTop=6;fontSize=11;" value="&lt;b&gt;TOUCHPOINT (adjust here)&lt;/b&gt;&#xa;/opt/ravenor/feeds.txt — DOCTRINE:&#xa;reliable sensors only, exploited fully.&#xa;Add feed only if reliable AND additive.&#xa;Verify vs. egress; DROP any noisy source.">
+          <mxGeometry x="420" y="375" width="330" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="s2_tech" parent="1" vertex="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#F1EFE8;strokeColor=#888780;align=left;spacingLeft=8;verticalAlign=top;spacingTop=6;fontSize=11;" value="&lt;b&gt;TECHNOLOGIES&lt;/b&gt;&#xa;• Interrogator_Ravenor (Ubuntu 24.04)&#xa;• collector.py: feedparser + trafilatura&#xa;• URL-hash + TITLE dedupe · systemd timer&#xa;• rclone → Google Drive">
+          <mxGeometry x="420" y="470" width="330" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="s2_status" parent="1" vertex="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E1F5EE;strokeColor=#0F6E56;align=left;spacingLeft=8;verticalAlign=middle;fontSize=11;fontStyle=1;" value="STATUS: ✔ COMPLETE — autonomous · ~49 clean feeds (national trusted sources; county keyword feeds dropped as noise)">
+          <mxGeometry x="420" y="555" width="330" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- STAGE 3: PROCESSING -->
+        <mxCell id="s3_head" parent="1" vertex="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E6F1FB;strokeColor=#185FA5;fontStyle=1;fontSize=14;verticalAlign=middle;" value="3. PROCESSING &amp; EXPLOITATION">
+          <mxGeometry x="780" y="130" width="330" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="s3_in" parent="1" vertex="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#185FA5;align=left;spacingLeft=8;verticalAlign=top;spacingTop=6;fontSize=11;" value="&lt;b&gt;INPUTS&lt;/b&gt;&#xa;• Rolling 7-day corpus (JSON)&#xa;• PIR tiers + elevation signals&#xa;• Scoring model">
+          <mxGeometry x="780" y="185" width="330" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="s3_out" parent="1" vertex="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#185FA5;align=left;spacingLeft=8;verticalAlign=top;spacingTop=6;fontSize=11;" value="&lt;b&gt;OUTPUTS&lt;/b&gt;&#xa;• Deduped corpus (URL + title hash)&#xa;• Tier-scored item set (at synthesis)&#xa;• Ranked candidate list">
+          <mxGeometry x="780" y="280" width="330" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="s3_tp" parent="1" vertex="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFF7E6;strokeColor=#C9820A;align=left;spacingLeft=8;verticalAlign=top;spacingTop=6;fontSize=11;" value="&lt;b&gt;TOUCHPOINT (adjust here)&lt;/b&gt;&#xa;Pre-filter keyword rules (tier&#xa;assignment); corpus date-window&#xa;logic. Discard log = tuning source.">
+          <mxGeometry x="780" y="375" width="330" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="s3_tech" parent="1" vertex="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#F1EFE8;strokeColor=#888780;align=left;spacingLeft=8;verticalAlign=top;spacingTop=6;fontSize=11;" value="&lt;b&gt;TECHNOLOGIES&lt;/b&gt;&#xa;• Python (local keyword pre-filter)&#xa;• Content-hash dedupe&#xa;• JSON corpus parsing&#xa;• (Planned) score-gate in synth.py">
+          <mxGeometry x="780" y="470" width="330" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="s3_status" parent="1" vertex="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF7E6;strokeColor=#C9820A;align=left;spacingLeft=8;verticalAlign=middle;fontSize=11;fontStyle=1;" value="STATUS: ◐ PARTIAL — URL+title dedupe CONFIRMED (5961→124); automated pre-filter/scoring PLANNED (see backlog)">
+          <mxGeometry x="780" y="555" width="330" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- STAGE 4: ANALYSIS & PRODUCTION (STAGING DRAFT) -->
+        <mxCell id="s4_head" parent="1" vertex="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E6F1FB;strokeColor=#185FA5;fontStyle=1;fontSize=14;verticalAlign=middle;" value="4. ANALYSIS &amp; PRODUCTION">
+          <mxGeometry x="1140" y="130" width="330" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="s4_in" parent="1" vertex="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#185FA5;align=left;spacingLeft=8;verticalAlign=top;spacingTop=6;fontSize=11;" value="&lt;b&gt;INPUTS&lt;/b&gt;&#xa;• Ranked candidate items&#xa;• Format exemplar (staging layout)&#xa;• Scoring model + PIRs">
+          <mxGeometry x="1140" y="185" width="330" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="s4_out" parent="1" vertex="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#185FA5;align=left;spacingLeft=8;verticalAlign=top;spacingTop=6;fontSize=11;" value="&lt;b&gt;OUTPUTS&lt;/b&gt;&#xa;• STAGING DRAFT (no markings)&#xa;• Headline + entry + source per item&#xa;• Serialized IDs, ranked in section">
+          <mxGeometry x="1140" y="280" width="330" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="s4_tp" parent="1" vertex="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFF7E6;strokeColor=#C9820A;align=left;spacingLeft=8;verticalAlign=top;spacingTop=6;fontSize=11;" value="&lt;b&gt;TOUCHPOINT (adjust here)&lt;/b&gt;&#xa;Staging exemplar (.md) — section&#xa;structure, entry-ID scheme, keyword&#xa;granularity, item-count target (5–8)">
+          <mxGeometry x="1140" y="375" width="330" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="s4_tech" parent="1" vertex="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#F1EFE8;strokeColor=#888780;align=left;spacingLeft=8;verticalAlign=top;spacingTop=6;fontSize=11;" value="&lt;b&gt;TECHNOLOGIES&lt;/b&gt;&#xa;• Claude synthesis (Sonnet 5 planned&#xa;automated; chat for manual)&#xa;• Markdown output&#xa;• Staging exemplar as template">
+          <mxGeometry x="1140" y="470" width="330" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="s4_status" parent="1" vertex="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF7E6;strokeColor=#C9820A;align=left;spacingLeft=8;verticalAlign=middle;fontSize=11;fontStyle=1;" value="STATUS: ◐ PARTIAL — format locked; brief v20260810 produced from clean corpus (analyst pass pending)">
+          <mxGeometry x="1140" y="555" width="330" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- STAGE 5: TEMPLATE / FORMATTING (NEW) -->
+        <mxCell id="s5_head" parent="1" vertex="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FBE7F3;strokeColor=#A32C7C;fontStyle=1;fontSize=14;verticalAlign=middle;" value="5. TEMPLATE / FORMATTING">
+          <mxGeometry x="1500" y="130" width="330" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="s5_in" parent="1" vertex="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#A32C7C;align=left;spacingLeft=8;verticalAlign=top;spacingTop=6;fontSize=11;" value="&lt;b&gt;INPUTS&lt;/b&gt;&#xa;• Staging draft (content only)&#xa;• Analyst review + deeper analysis&#xa;• Distribution template">
+          <mxGeometry x="1500" y="185" width="330" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="s5_out" parent="1" vertex="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#A32C7C;align=left;spacingLeft=8;verticalAlign=top;spacingTop=6;fontSize=11;" value="&lt;b&gt;OUTPUTS&lt;/b&gt;&#xa;• Distribution-ready product&#xa;• Presentation + analysis applied&#xa;• Handling marking applied (TLP:CLEAR)">
+          <mxGeometry x="1500" y="280" width="330" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="s5_tp" parent="1" vertex="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFF7E6;strokeColor=#C9820A;align=left;spacingLeft=8;verticalAlign=top;spacingTop=6;fontSize=11;" value="&lt;b&gt;TOUCHPOINT (adjust here)&lt;/b&gt;&#xa;The distribution template itself —&#xa;branding, layout, analytic depth,&#xa;handling marking (TLP:CLEAR)">
+          <mxGeometry x="1500" y="375" width="330" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="s5_tech" parent="1" vertex="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#F1EFE8;strokeColor=#888780;align=left;spacingLeft=8;verticalAlign=top;spacingTop=6;fontSize=11;" value="&lt;b&gt;TECHNOLOGIES&lt;/b&gt;&#xa;• Distribution template (format TBD)&#xa;• Human analyst (presentation +&#xa;deeper analysis)">
+          <mxGeometry x="1500" y="470" width="330" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="s5_status" parent="1" vertex="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FAECE7;strokeColor=#993C1D;align=left;spacingLeft=8;verticalAlign=middle;fontSize=11;fontStyle=1;" value="STATUS: ○ NOT STARTED — template not yet built">
+          <mxGeometry x="1500" y="555" width="330" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- STAGE 6: DISSEMINATION -->
+        <mxCell id="s6_head" parent="1" vertex="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E6F1FB;strokeColor=#185FA5;fontStyle=1;fontSize=14;verticalAlign=middle;" value="6. DISSEMINATION">
+          <mxGeometry x="1860" y="130" width="330" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="s6_in" parent="1" vertex="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#185FA5;align=left;spacingLeft=8;verticalAlign=top;spacingTop=6;fontSize=11;" value="&lt;b&gt;INPUTS&lt;/b&gt;&#xa;• Distribution-ready product&#xa;• Distribution list&#xa;• Monday-AM publish target">
+          <mxGeometry x="1860" y="185" width="330" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="s6_out" parent="1" vertex="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#185FA5;align=left;spacingLeft=8;verticalAlign=top;spacingTop=6;fontSize=11;" value="&lt;b&gt;OUTPUTS&lt;/b&gt;&#xa;• Published product&#xa;• Delivered to SLTT audience&#xa;• 2 CCIC analysts (downstream)">
+          <mxGeometry x="1860" y="280" width="330" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="s6_tp" parent="1" vertex="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFF7E6;strokeColor=#C9820A;align=left;spacingLeft=8;verticalAlign=top;spacingTop=6;fontSize=11;" value="&lt;b&gt;TOUCHPOINT (adjust here)&lt;/b&gt;&#xa;Output destination + distribution&#xa;list. Cadence (Mon AM publish).&#xa;Trigger mechanism (TBD).">
+          <mxGeometry x="1860" y="375" width="330" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="s6_tech" parent="1" vertex="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#F1EFE8;strokeColor=#888780;align=left;spacingLeft=8;verticalAlign=top;spacingTop=6;fontSize=11;" value="&lt;b&gt;TECHNOLOGIES&lt;/b&gt;&#xa;• Google Drive (delivery)&#xa;• Distribution channel (TBD)&#xa;• (Trigger mechanism undecided)">
+          <mxGeometry x="1860" y="470" width="330" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="s6_status" parent="1" vertex="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FAECE7;strokeColor=#993C1D;align=left;spacingLeft=8;verticalAlign=middle;fontSize=11;fontStyle=1;" value="STATUS: ○ NOT STARTED — manual publish only">
+          <mxGeometry x="1860" y="555" width="330" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- STAGE 7: FEEDBACK -->
+        <mxCell id="s7_head" parent="1" vertex="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#EEEDFE;strokeColor=#534AB7;fontStyle=1;fontSize=14;verticalAlign=middle;" value="7. FEEDBACK &amp; EVALUATION">
+          <mxGeometry x="2220" y="130" width="330" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="s7_in" parent="1" vertex="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#534AB7;align=left;spacingLeft=8;verticalAlign=top;spacingTop=6;fontSize=11;" value="&lt;b&gt;INPUTS&lt;/b&gt;&#xa;• Analyst review notes (cuts, fixes)&#xa;• Discard log (collection misses)&#xa;• Consumer feedback (SLTT/analysts)">
+          <mxGeometry x="2220" y="185" width="330" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="s7_out" parent="1" vertex="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#534AB7;align=left;spacingLeft=8;verticalAlign=top;spacingTop=6;fontSize=11;" value="&lt;b&gt;OUTPUTS&lt;/b&gt;&#xa;• Tuned PIRs / weights&#xa;• Feed list adjustments&#xa;• Format + template refinements">
+          <mxGeometry x="2220" y="280" width="330" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="s7_tp" parent="1" vertex="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFF7E6;strokeColor=#C9820A;align=left;spacingLeft=8;verticalAlign=top;spacingTop=6;fontSize=11;" value="&lt;b&gt;TOUCHPOINT (adjust here)&lt;/b&gt;&#xa;The analyst pass itself (always&#xa;overrides the score). Empirical&#xa;tuning of IR weights over editions.">
+          <mxGeometry x="2220" y="375" width="330" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="s7_tech" parent="1" vertex="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#F1EFE8;strokeColor=#888780;align=left;spacingLeft=8;verticalAlign=top;spacingTop=6;fontSize=11;" value="&lt;b&gt;TECHNOLOGIES&lt;/b&gt;&#xa;• Human analyst (you)&#xa;• Discard log instrumentation&#xa;• Version-controlled artifacts">
+          <mxGeometry x="2220" y="470" width="330" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="s7_status" parent="1" vertex="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E6F1FB;strokeColor=#185FA5;align=left;spacingLeft=8;verticalAlign=middle;fontSize=11;fontStyle=1;" value="STATUS: ◑ ONGOING — runs each cycle">
+          <mxGeometry x="2220" y="555" width="330" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- FLOW ARROWS -->
+        <mxCell id="a12" parent="1" edge="1" source="s1_head" target="s2_head" style="endArrow=block;html=1;strokeColor=#185FA5;strokeWidth=2;"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="a23" parent="1" edge="1" source="s2_head" target="s3_head" style="endArrow=block;html=1;strokeColor=#185FA5;strokeWidth=2;"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="a34" parent="1" edge="1" source="s3_head" target="s4_head" style="endArrow=block;html=1;strokeColor=#185FA5;strokeWidth=2;"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="a45" parent="1" edge="1" source="s4_head" target="s5_head" style="endArrow=block;html=1;strokeColor=#A32C7C;strokeWidth=2;"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="a56" parent="1" edge="1" source="s5_head" target="s6_head" style="endArrow=block;html=1;strokeColor=#185FA5;strokeWidth=2;"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="a67" parent="1" edge="1" source="s6_head" target="s7_head" style="endArrow=block;html=1;strokeColor=#185FA5;strokeWidth=2;"><mxGeometry relative="1" as="geometry" /></mxCell>
+
+        <!-- FEEDBACK LOOP -->
+        <mxCell id="a71" parent="1" edge="1" source="s7_head" target="s1_head" style="endArrow=block;html=1;strokeColor=#534AB7;strokeWidth=2;dashed=1;exitX=0.5;exitY=0;entryX=0.5;entryY=0;curved=1;fontSize=11;fontColor=#534AB7;" value="feedback loop — cycle repeats">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points"><mxPoint x="2385" y="110" /><mxPoint x="225" y="110" /></Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- STAGING BOUNDARY NOTE -->
+        <mxCell id="boundary_note" parent="1" vertex="1" style="text;html=1;align=center;fontSize=11;fontStyle=2;fontColor=#A32C7C;" value="◄ staging artifact (this pipeline's output) ─┼─ distribution product (template &amp; delivery) ►">
+          <mxGeometry x="1140" y="605" width="690" height="24" as="geometry" />
+        </mxCell>
+
+        <!-- LEGEND -->
+        <mxCell id="legend_box" parent="1" vertex="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#888780;dashed=1;verticalAlign=top;align=left;fontStyle=1;fontSize=13;spacingLeft=10;spacingTop=8;" value="Legend">
+          <mxGeometry x="60" y="660" width="900" height="240" as="geometry" />
+        </mxCell>
+        <mxCell id="leg_row_color" parent="1" vertex="1" style="text;html=1;align=left;fontSize=11;verticalAlign=top;" value="&lt;b&gt;Cell colors&lt;/b&gt;&#xa;• White border = Inputs / Outputs (data through the stage)&#xa;• Amber = Touchpoint — where YOU adjust this stage&#xa;• Grey = Technologies supporting the stage&#xa;• Header blue = cycle stage · pink = template/formatting · purple = feedback">
+          <mxGeometry x="80" y="695" width="520" height="140" as="geometry" />
+        </mxCell>
+        <mxCell id="leg_row_status" parent="1" vertex="1" style="text;html=1;align=left;fontSize=11;verticalAlign=top;" value="&lt;b&gt;Status key&lt;/b&gt;&#xa;✔ COMPLETE (green)&#xa;◐ PARTIAL (amber)&#xa;○ NOT STARTED (red)&#xa;◑ ONGOING (blue)">
+          <mxGeometry x="640" y="695" width="300" height="140" as="geometry" />
+        </mxCell>
+
+        <!-- BACKLOG -->
+        <mxCell id="backlog_box" parent="1" vertex="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FAFAF7;strokeColor=#5F5E5A;verticalAlign=top;align=left;fontStyle=1;fontSize=13;spacingLeft=10;spacingTop=8;" value="Open Items / Backlog (tracker)">
+          <mxGeometry x="1000" y="660" width="1550" height="240" as="geometry" />
+        </mxCell>
+        <mxCell id="backlog_body" parent="1" vertex="1" style="text;html=1;align=left;fontSize=11;verticalAlign=top;" value="&lt;b&gt;DONE this session&lt;/b&gt;&#xa;✔ Title-dedup added to collector.py — confirmed (5961→124 on 2nd run)&#xa;✔ Feed set verified vs. Ravenor egress; national trusted sources live (~49)&#xa;✔ DROPPED 34 county Google News feeds — keyword search = noise, wrong instrument&#xa;✔ Staging brief v20260810 produced from clean corpus (water/OT sector lead)&#xa;✔ External review (Gemini) incorporated — accepted items below&#xa;&#xa;&lt;b&gt;DOCTRINE (settled)&lt;/b&gt; — quality over quantity on SENSORS; generous on ITEMS.&#xa;Strict on feeds (drop noisy ones); prefer false positives to false negatives on items.&#xa;Reliable + additive is the bar for adding a feed. Synthesis stays MANUAL (no API).&#xa;&#xa;&lt;b&gt;Next builds (accepted from review)&lt;/b&gt;&#xa;• PRE-FILTER script on Ravenor: score corpus, surface top ~50–60 + drop list, output candidate .md. Solves corpus-volume problem. NO API — local scoring only. Must show reasoning + drop list (audit rule).&#xa;• CA AG breach registry scraper — authoritative AOR breach sensor (not RSS)&#xa;• NEW: ransomware leak-site aggregator (e.g. Ransomware.live) filtered for CA — early-warning AOR sensor&#xa;• Curated AOR sources (MS-ISAC, Cal OES, CDT, CA regional press) — verify + load&#xa;&#xa;&lt;b&gt;Open / deferred&lt;/b&gt;&#xa;• Distribution template + TLP:CLEAR layer — not built&#xa;• Analyst pass on v20260810 (merge cross-section dupes A/E + G/K; elevate primary sources; verify Minnesota water claim)&#xa;• Fuzzy dedup (Jaccard/Levenshtein) — deferred, not now (only if false-merges observed)&#xa;• Ravenor unmonitored (no Wazuh agent) — deferred&#xa;&#xa;&lt;b&gt;Considered + REJECTED&lt;/b&gt;&#xa;• Additive scoring model (Gemini rec) — would reverse the deliberate convergence-wins choice; keep multiplicative, treat score as ordering aid not measurement">
+          <mxGeometry x="1020" y="695" width="1510" height="190" as="geometry" />
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
