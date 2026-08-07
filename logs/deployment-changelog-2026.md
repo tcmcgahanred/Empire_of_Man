@@ -2244,3 +2244,72 @@ Built the collector pipeline on Ravenor end-to-end and made it autonomous.
 - `wg`/SSH over the Webway tunnel can drop mid-session — `tmux` for anything long/interactive on Ravenor.
 
 **Status:** collector fully operational and autonomous. Remaining: build the consumption side — Claude reading `gdrive:ravenor-corpus` weekly to synthesize the CTI brief.
+
+## [2026-08-04] Session 22 — PG-Custodes DHCP Anomaly Root-Caused & Fixed
+
+### The bug (finally closed)
+Long-standing open item across Sessions 17/18/19/21: PG-Custodes kept handing out DHCP leases despite being documented as static-only. Two confirmed instances (Hive_Secundus pulled `192.168.2.104`; Valdor's `ens38` pulled a lease). Never root-caused until now.
+
+### Root cause — documentation drift, not a mystery
+The DHCP server on **Rogal_Dorn's Custodes interface was never disabled.** In Session 15 the Custodes interface was stood up with *"DHCP server enabled on Custodes: range `192.168.2.100`-`192.168.2.200`"*. The same session's "static migration" only disabled DHCP on **LAN / PG-Ultramarines** — Custodes was left serving DHCP. The "static-only" label reflected *intent* that never made it into the actual pfSense config. Both anomaly leases (`.104`, and `ens38`) fell inside the `.100–.200` scope — fully consistent.
+
+### Fix
+- **Status → DHCP Leases** checked first: Custodes lease table **empty** → no host currently depending on a lease (all residents on static config). Safe to disable.
+- **Services → DHCP Server → Custodes → unchecked "Enable DHCP server on Custodes interface" → Save/Apply.**
+- Verified nothing broke: `192.168.2.10` (Valdor mgmt) still answers on its static IP. Custodes segment now genuinely static-only, matching the documented design.
+
+### Lesson
+- **A documented "static-only" segment is not proof.** The DHCP *server* config on the firewall is the source of truth — verify Services → DHCP Server per interface, not the intent captured in notes. Doc-vs-reality drift produced a ghost that survived four sessions.
+
+### Status
+PG-Custodes DHCP anomaly **RESOLVED**. Long-standing open item closed.
+
+## [2026-08-04] Session 22 (cont.) — Model #1 Reshuffle: PG Rename, Defenders/Victims Split, Valdor Rebuilt
+
+### Why
+Chasing enterprise org-chart fidelity in a 3-NIC lab was costing coverage. Pivoted to the community-standard three-zone SOC model, collapsed onto the two available segments: one defender/SOC zone, one victim/target zone. Split Wazuh (endpoint plane) from Security Onion (network plane) is fine and kept — the real gap was sensor *placement*, not the two-server design.
+
+### Naming / role changes (subnets & VLAN IDs unchanged)
+- **PG-Ultramarines → PG-Custodes** (`192.168.1.0/24`, VLAN 20) = **defenders / SOC**. Custodes = the Emperor's guardians; fits blue team.
+- **PG-Custodes → PG-Cadia** (`192.168.2.0/24`, VLAN 30) = **victims / target range**. Cadia = the world built to be assaulted.
+- Rename done in ESXi (rename `.2`→Cadia first to free the "Custodes" name, then `.1`→Custodes), each VM NIC + Rogal_Dorn `vmx1/vmx2` re-pointed to the new PGs. Static IPs, so pure L2 reattach — no re-IP of Guilliman/Hive_Secundus.
+
+### Placement principle (the lesson)
+- **Endpoint plane (Wazuh):** agent-based, routes fine across segments — manager placement is irrelevant, coverage = "is there an agent?"
+- **Network plane (Security Onion):** tap-based — sees only what physically arrives on the sniffing NIC. Coverage = "is a sniffing NIC on this segment with promiscuous mode on?" **The sniffing NIC must follow the victims.**
+
+### Valdor rebuilt (Security Onion 3.1, fresh)
+- Old Valdor deleted (nothing customized — no loss). SO management IP change is explicitly *not recommended* by SO docs (`so-ip-update` is experimental, standalone-only), so a clean reinstall was the right call rather than re-IP.
+- New standalone node: **management NIC on PG-Custodes `192.168.1.10/24`** (gw `.1.1`), **monitor NIC on PG-Cadia (no IP)**. HOME_NET `192.168.2.0/24`, analyst access `192.168.0.0/16`, direct internet, default Docker `172.17.0.0/16`.
+- Install notes: SO 3.1 ISO boot menu = normal (not Desktop = analyst workstation, not appliance = SOS hardware). "Configure network" first to set the static mgmt IP (segment has no DHCP) before install. Mgmt interface not bonded; monitor is a separate role, not bonded to it.
+- New analyst console: `https://192.168.1.10`.
+
+### PG-Cadia tap
+- PG-Cadia port group set **Promiscuous Mode = Accept** (+ Forged Transmits) so Valdor's monitor NIC sees victim-segment traffic.
+
+### Topology
+- `topology.drawio` updated to defenders/victims split + Valdor relocation + sniff tap, then **user made manual layout edits in draw.io and re-uploaded — that version is now canonical.**
+
+### Status
+Reshuffle complete pending SO install finish + Phase 5 verification (ping checks, Wazuh agents reporting, SO sees Cadia traffic).
+
+### Session 22 (cont.) — RESUME POINT (pause 2026-08-04 PM)
+Where we stopped, to pick up tonight:
+- **SO rebuilt and reachable.** so-status all green; dashboard loads at `https://192.168.1.10`.
+- **Dashboard access gotcha (solved):** Webway clients arrive sourced from tunnel IP `10.10.10.2`, outside the `192.168.0.0/16` analyst allow range, so SO's host firewall dropped them (SYNs seen inbound, no SYN-ACK). Fixed with `sudo so-firewall includehost analyst 10.10.10.2` then **`sudo so-firewall apply`** (the `apply` is required — includehost only writes config). Consider adding `10.10.10.0/24` for all future Webway analysts.
+- **Wazuh agent on Hive_Secundus:** installed (4.14.6, DEB) and **Active** on the manager — endpoint-plane gap closed.
+- **REMAINING (the one verification left):** prove SO sees PG-Cadia traffic. Test: from Alpharius `eth1` (`192.168.2.101`) run `nmap -sT 192.168.2.104`, then confirm the `192.168.2.x` activity appears in SO Alerts (Suricata) / Zeek Connections. If it shows, the tap is confirmed and Phase 5 is done → then mark docs final.
+
+## [2026-08-06] Session 23 — Sanctum Auspicium repo linked; iPhone Webway → Ravenor access
+
+### Git / Sanctum Auspicium (lab-infra relevant)
+- **Ravenor now a git working copy** of the private GitHub remote `tcmcgahanred/Empire_of_Man`. Cloned over HTTPS (port 443 — Ravenor's isolated-segment egress passes 443; SSH/22 not relied on). Auth via a **fine-grained PAT scoped to the single repo** (Contents R/W), stored via `credential.helper store` on Ravenor; token of record kept in Keeper, never in the repo.
+- Imported the live CTI pipeline into `sanctum-auspicium/cti/` and pushed: `acolyte.py` (v1.1), `arbites.py` (v0.4), `run.sh`, `config/` feed lists. Runtime data (`seen*`, `corpus/`, staging output, `venv/`) gitignored. Pre-commit secret scan clean (no IPs/tokens).
+
+### Webway — iPhone extended to reach Ravenor
+- Added `192.168.3.0/24` to the **iPhone WireGuard tunnel's AllowedIPs**. No server-side change needed — EoT already routes `192.168.3.0/24` → Conclave and the path was proven via VS.
+- Confirmed end-to-end from the phone: **Termius SSH `ravenor@192.168.3.10` → `git pull`** works over Webway. Ravenor's repo is now manageable from the phone.
+- Note: **SSH is not enabled on Rogal_Dorn** (pfSense default off) — surfaced while testing Termius; Rogal is reached via its web GUI, not SSH. Not changed (no need).
+
+### Status
+Sanctum Auspicium repo operational; Ravenor + VS + iPhone all have paths to it. Remaining Sanctum work is content-side (import `codex.md`, Vox edition, `cogitator.drawio`, `effort_briefing.md`), tracked in the repo, not here.
