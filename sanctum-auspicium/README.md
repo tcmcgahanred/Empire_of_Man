@@ -84,7 +84,7 @@ sanctum-auspicium/
 │   │   └── vox_v20260810.md          # brief editions, publish-date keyed (import)
 │   └── docs/
 │       └── effort_briefing.md        # external-review explainer (import)
-└── s2/                      # Effort 2 — CANG Aviation S2 (future stub)
+└── s2/                      # Effort 2 — [REDACTED] (future stub)
     └── README.md
 ```
 
